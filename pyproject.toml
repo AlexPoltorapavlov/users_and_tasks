@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "users-and-tasks"
+version = "0.1.0"
+description = ""
+authors = ["Alex Poltorapavlov <poltorapavlov.iskander@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.115.6"
+fastapi-users = {extras = ["sqlalchemy"], version = "^14.0.0"}
+aiosqlite = "^0.20.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
