@@ -1,18 +1,15 @@
 from collections.abc import AsyncGenerator
-from config import config
+from .config import config
 
 from fastapi import Depends
 from fastapi_users.db import SQLAlchemyUserDatabase
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
-from models.user import User
+from .models.user import User, Base
 
 
 DATABASE_URL = config.DATABASE_URL
-
-class Base(DeclarativeBase):
-    pass
 
 
 engine = create_async_engine(DATABASE_URL)
