@@ -4,8 +4,8 @@ from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI
 
-from database import User, create_db_and_tables
-from app.schemas import UserCreate, UserRead, UserUpdate
+from db import User, create_db_and_tables
+from schemas.users import UserCreate, UserRead, UserUpdate
 from auth.auth import auth_backend, current_active_user, fastapi_users
 
 @asynccontextmanager

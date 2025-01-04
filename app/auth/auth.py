@@ -4,7 +4,7 @@ import uuid
 from fastapi import Depends, Request
 from fastapi_users import BaseUserManager, UUIDIDMixin
 
-from database import User, get_user_db
+from app.db import User, get_user_db
 from config import config
 
 bearer_transport = BearerTransport(tokenUrl="oauth/jwt/login")
