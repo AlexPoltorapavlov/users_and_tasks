@@ -1,8 +1,7 @@
 from fastapi_users.authentication import JWTStrategy, BearerTransport, AuthenticationBackend
 from ..config import config
-import uuid
 from fastapi import Depends, Request
-from fastapi_users import BaseUserManager, UUIDIDMixin, FastAPIUsers
+from fastapi_users import BaseUserManager, FastAPIUsers
 
 from ..db import User, get_user_db
 
@@ -20,7 +19,7 @@ auth_backend = AuthenticationBackend(
 )
 
 
-class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
+class UserManager(BaseUserManager[User, int]):
     reset_password_token_secret = SECRET
     verification_token_secret = SECRET
 
@@ -33,9 +32,12 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
     async def on_after_request_verify(self, user, token, request = None):
         return await super().on_after_request_verify(user, token, request)
 
+    def parse_id(self, value):
+        return int(value)
+
 async def get_user_manager(user_db=Depends(get_user_db)):
     yield UserManager(user_db)
 
-fastapi_users = FastAPIUsers[User, uuid.UUID](get_user_manager, [auth_backend])
+fastapi_users = FastAPIUsers[User, int](get_user_manager, [auth_backend])
 current_active_user = fastapi_users.current_user(active=True)
 

@@ -1,14 +1,11 @@
-import uuid
-
 from fastapi_users import schemas
+from typing import Optional
 
-class UserRead(schemas.BaseUser[uuid.UUID]):
-    username: str
+class UserRead(schemas.BaseUser[int]):
+    name: str
 
 class UserCreate(schemas.BaseUserCreate):
-    username: str
-    password: str
+    name: str
 
 class UserUpdate(schemas.BaseUserUpdate):
-    username: str
-    password: str
+    name: Optional[str]

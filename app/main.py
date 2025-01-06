@@ -48,4 +48,4 @@ async def authenticated_route(user: User = Depends(current_active_user)):
 
 
 if __name__ == "__main__":
-    uvicorn.run("app.app:app", host="0.0.0.0", log_level="info")
+    uvicorn.run("app.main:app", host="0.0.0.0", log_level="info")

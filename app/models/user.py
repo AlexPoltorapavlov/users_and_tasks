@@ -1,10 +1,11 @@
-from fastapi_users.db import SQLAlchemyBaseUserTableUUID
+from fastapi_users.db import SQLAlchemyBaseUserTable
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy import Column, String, Integer
 
 class Base(DeclarativeBase):
     pass
 
-class User(SQLAlchemyBaseUserTableUUID, Base):
-    username = Column(String)
-    password = Column(String)
+class User(SQLAlchemyBaseUserTable, Base):
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String, nullable=False)
+ 
