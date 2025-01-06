@@ -8,4 +8,4 @@ class UserCreate(schemas.BaseUserCreate):
     name: str
 
 class UserUpdate(schemas.BaseUserUpdate):
-    name: Optional[str]
+    name: Optional[str] = None

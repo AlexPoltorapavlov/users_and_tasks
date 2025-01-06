@@ -7,5 +7,5 @@ class Base(DeclarativeBase):
 
 class User(SQLAlchemyBaseUserTable, Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String, nullable=False)
+    name = Column(String, nullable=True)
  
