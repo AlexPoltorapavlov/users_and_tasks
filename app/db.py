@@ -5,7 +5,7 @@ from fastapi import Depends
 from fastapi_users.db import SQLAlchemyUserDatabase
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from .models.user import User, Base
+from .models.models import User, Base
 
 
 DATABASE_URL = config.DATABASE_URL
