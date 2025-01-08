@@ -3,7 +3,8 @@ from ..config import config
 from fastapi import Depends, Request
 from fastapi_users import BaseUserManager, FastAPIUsers
 
-from ..db import User, get_user_db
+from ..models.models import User
+from ..db import get_user_db
 
 bearer_transport = BearerTransport(tokenUrl="oauth/jwt/login")
 
