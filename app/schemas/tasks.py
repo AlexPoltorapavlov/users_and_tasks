@@ -7,10 +7,6 @@ class StatusEnum(str, Enum):
     in_progress = 'in_progress'
     completed = 'completed'
 
-class TaskBase(BaseModel):
-    name: str
-    description: str
-
 class TaskRead(BaseModel):
     id: int
     name: str
@@ -21,8 +17,7 @@ class TaskRead(BaseModel):
 class TaskCreate(BaseModel):
     name: str
     description: str
-    status: StatusEnum = StatusEnum.new
-    user_id: int
+    status: Optional[StatusEnum] = StatusEnum.new
 
 class TaskUpdate(BaseModel):
     name: Optional[str] = None

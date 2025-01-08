@@ -36,7 +36,7 @@ class TaskRepository:
         return task
 
     async def delete_task(self, task_id: int, user_id: int):
-        task = self.get_task_by_id(task_id, user_id)
+        task = await self.get_task_by_id(task_id, user_id)
         if task is None:
             return None
         
