@@ -4,9 +4,18 @@ from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI
 
-from .db import User, create_db_and_tables
+# db imports
+from .db import User, create_db_and_tables, get_async_session
+
+# schemas import
 from .schemas.users import UserCreate, UserRead, UserUpdate
+from .schemas.tasks import TaskCreate, TaskRead, TaskUpdate, TaskBase
+
+# auth
 from .auth.auth import auth_backend, current_active_user, fastapi_users
+
+# Repositories
+from .dal.task import TaskRepository
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -46,6 +55,11 @@ app.include_router(
 async def authenticated_route(user: User = Depends(current_active_user)):
     return {"message": f"Hello {user.email}!"}
 
+@app.post("/tasks", response_model=TaskRead)
+async def create_task(task: TaskBase,
+                      user: UserRead = Depends(current_active_user),
+                      session = Depends(get_async_session)):
+    return await TaskRepository(session).create_task(task_data=task, user_id=user.id)
 
 if __name__ == "__main__":
     uvicorn.run("app.main:app", host="0.0.0.0", log_level="info")

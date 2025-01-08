@@ -1,28 +1,31 @@
+from enum import Enum
 from typing import Optional
 from pydantic import BaseModel, field_validator
 
-class TaskBaseModel(BaseModel):
-    @field_validator('status')
-    def validators(self, key, value):
-        if key == 'status' and value not in ['new', 'in_progress', 'completed']:
-            raise ValueError('Invalid status')
-        return value
+class StatusEnum(str, Enum):
+    new = 'new'
+    in_progress = 'in_progress'
+    completed = 'completed'
 
+class TaskBase(BaseModel):
+    name: str
+    description: str
 
-class TaskRead(TaskBaseModel):
+class TaskRead(BaseModel):
     id: int
     name: str
     description: str
-    status: str
+    status: StatusEnum
     user_id: int
 
-class TaskCreate(TaskBaseModel):
+class TaskCreate(BaseModel):
     name: str
     description: str
-    status: str = 'new'
+    status: StatusEnum = StatusEnum.new
     user_id: int
 
-class TaskUpdate(TaskBaseModel):
+class TaskUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
-    status: Optional[str] = None
+    status: Optional[StatusEnum] = None
+

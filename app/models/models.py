@@ -17,7 +17,7 @@ class Task(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String)
     description = Column(String)
-    status = Column(String, nullable=False)
+    status = Column(String, nullable=False, default='new')
     user_id = Column(Integer, ForeignKey(User.id))
     user = relationship('User', back_populates="tasks")
 
