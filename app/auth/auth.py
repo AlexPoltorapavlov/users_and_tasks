@@ -6,7 +6,7 @@ from fastapi_users import BaseUserManager, FastAPIUsers
 from ..models.models import User
 from ..db import get_user_db
 
-bearer_transport = BearerTransport(tokenUrl="oauth/jwt/login")
+bearer_transport = BearerTransport(tokenUrl="auth/jwt/login")
 
 SECRET = config.JWT_SECRET_KEY
 
