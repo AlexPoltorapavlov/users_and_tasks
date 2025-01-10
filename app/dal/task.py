@@ -2,13 +2,14 @@ from fastapi import Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from ..models.models import Task
+from ..schemas.tasks import *
 from ..db import get_async_session
 
 class TaskRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def create_task(self, task_data, user_id: int):
+    async def create_task(self, task_data: TaskCreate, user_id: int):
         task = Task(**task_data.model_dump(), user_id = user_id)
         self.session.add(task)
         await self.session.commit()
@@ -23,12 +24,12 @@ class TaskRepository:
         result = await self.session.execute(select(Task).where(Task.id == task_id, Task.user_id == user_id))
         return result.scalar_one_or_none()
 
-    async def update_task(self, task_id: int, task_data, user_id: int):
+    async def update_task(self, task_id: int, task_data: TaskUpdate, user_id: int):
         task = await self.get_task_by_id(task_id, user_id)
         if task is None:
             return None
 
-        for key, value in task_data.dict(exclude_unset=True).items():
+        for key, value in task_data.model_dump(exclude_unset=True).items():
             setattr(task, key, value)
 
         await self.session.commit()
