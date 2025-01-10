@@ -9,7 +9,7 @@ class TaskRepository:
         self.session = session
 
     async def create_task(self, task_data, user_id: int):
-        task = Task(**task_data.dict(), user_id = user_id)
+        task = Task(**task_data.model_dump(), user_id = user_id)
         self.session.add(task)
         await self.session.commit()
         await self.session.refresh(task)
