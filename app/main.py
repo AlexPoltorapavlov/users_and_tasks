@@ -20,6 +20,9 @@ from .dal.task import TaskRepository
 # sqlalchemy
 from sqlalchemy.ext.asyncio import AsyncSession
 
+# routes
+from app.routes import authenticated_router
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Not needed if you setup a migration system like Alembic
@@ -52,11 +55,7 @@ app.include_router(
     prefix="/users",
     tags=["users"],
 )
-
-
-@app.get("/authenticated-route")
-async def authenticated_route(user: User = Depends(current_active_user)):
-    return {"message": f"Hello {user.email}!"}
+app.include_router(authenticated_router)
 
 @app.post("/tasks", response_model=TaskRead)
 async def create_task(task: TaskCreate,
