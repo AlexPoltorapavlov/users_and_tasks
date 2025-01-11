@@ -6,6 +6,8 @@ from fastapi_users import BaseUserManager, FastAPIUsers
 from ..models.models import User
 from ..db import get_user_db
 
+from typing import Optional
+
 bearer_transport = BearerTransport(tokenUrl="auth/jwt/login")
 
 SECRET = config.JWT_SECRET_KEY
@@ -19,19 +21,31 @@ auth_backend = AuthenticationBackend(
     get_strategy=get_jwt_strategy,
 )
 
-
 class UserManager(BaseUserManager[User, int]):
     reset_password_token_secret = SECRET
     verification_token_secret = SECRET
 
-    async def on_after_register(self, user, request = None):
-        return await super().on_after_register(user, request)
-    
-    async def on_after_forgot_password(self, user, token, request = None):
-        return await super().on_after_forgot_password(user, token, request)
-    
-    async def on_after_request_verify(self, user, token, request = None):
-        return await super().on_after_request_verify(user, token, request)
+    async def on_after_register(self, user: User, request: Optional[Request] = None):
+        print(f"User {user.id} has registered.")  # Логирование для отладки
+        # Вызываем метод из user_db, если он есть
+        if hasattr(self.user_db, 'on_after_register'):
+            await self.user_db.on_after_register(user, request)
+        else:
+            await super().on_after_register(user, request)  # Вызов родительского метода
+
+    async def on_after_forgot_password(self, user: User, token: str, request: Optional[Request] = None):
+        print(f"User {user.id} has requested a password reset.")
+        if hasattr(self.user_db, 'on_after_forgot_password'):
+            await self.user_db.on_after_forgot_password(user, token, request)
+        else:
+            await super().on_after_forgot_password(user, token, request)
+
+    async def on_after_request_verify(self, user: User, token: str, request: Optional[Request] = None):
+        print(f"User {user.id} has requested a verification.")
+        if hasattr(self.user_db, 'on_after_request_verify'):
+            await self.user_db.on_after_request_verify(user, token, request)
+        else:
+            await super().on_after_request_verify(user, token, request)
 
     def parse_id(self, value):
         return int(value)
