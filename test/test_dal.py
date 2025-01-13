@@ -1,5 +1,4 @@
 import pytest
-import pytest_asyncio
 from sqlalchemy import select
 from app.dal.task import TaskRepository
 import app.schemas.tasks as TaskScheme
