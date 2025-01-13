@@ -36,7 +36,7 @@ def app():
     app = FastAPI()
     app.include_router(fastapi_users.get_auth_router(auth_backend), prefix="/auth/jwt")
     app.include_router(fastapi_users.get_register_router(UserRead, UserCreate), prefix="/auth")
-    app.include_router(authenticated_router())
+    app.include_router(authenticated_router)
     return app
 
 @pytest.fixture
@@ -97,7 +97,7 @@ async def test_auth_backend():
     assert backend.name == "jwt"
     assert isinstance(backend.transport, BearerTransport)
     assert isinstance(backend.get_strategy(), JWTStrategy)
-"""
+
 # Тестируем endpoint /auth/jwt/login
 @pytest.mark.asyncio
 async def test_login_endpoint(client):
@@ -113,8 +113,6 @@ async def test_login_endpoint(client):
     )
 
     # Use dependency override
-    app.dependency_overrides[get_user_manager] = lambda: user_manager
-
     login_data = {
         "username": "test@example.com",
         "password": "test"
@@ -129,9 +127,6 @@ async def test_current_active_user(client):
     user_manager = AsyncMock()
     user_manager.get_current_user.return_value = user
 
-    # Use dependency override
-    app.dependency_overrides[get_user_manager] = lambda: user_manager
-
     # Generate a valid JWT token
     from app.auth.auth import get_jwt_strategy
     strategy = get_jwt_strategy()
@@ -140,4 +135,3 @@ async def test_current_active_user(client):
     response = client.get("/authenticated-route", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 200
     assert response.json() == {"message": "You are authenticated", "user_id": 1}
-"""
