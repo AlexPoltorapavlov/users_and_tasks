@@ -22,7 +22,7 @@ class TaskRepository:
 
     async def get_task_by_id(self, task_id: int, user_id: int):
         result = await self.session.execute(select(Task).where(Task.id == task_id, Task.user_id == user_id))
-        return result.scalar_one_or_none()
+        return result.scalar_one_or_none() if result.scalar_one_or_none() else None
 
     async def update_task(self, task_id: int, task_data: TaskUpdate, user_id: int):
         task = await self.get_task_by_id(task_id, user_id)

@@ -1,7 +1,5 @@
 import uvicorn
-
 from contextlib import asynccontextmanager
-
 from fastapi import Depends, FastAPI
 
 # db imports
@@ -22,6 +20,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 # routes
 from app.routes import authenticated_router
+from .routes.tasks import router as tasks_router
 
 app = FastAPI()
 
@@ -49,36 +48,7 @@ app.include_router(
     tags=["users"],
 )
 app.include_router(authenticated_router)
-
-@app.post("/tasks", response_model=TaskRead)
-async def create_task(task: TaskCreate,
-                      user: UserRead = Depends(current_active_user),
-                      session: AsyncSession = Depends(get_async_session)):
-    return await TaskRepository(session).create_task(task_data=task, user_id=user.id)
-
-@app.get("/tasks")
-async def get_all_tasks(user: UserRead = Depends(current_active_user),
-                        session: AsyncSession = Depends(get_async_session)):
-    return await TaskRepository(session).get_tasks(user.id)
-
-@app.get("/tasks/{task_id}" )
-async def get_task(task_id: int,
-                   user: UserRead = Depends(current_active_user),
-                   session: AsyncSession = Depends(get_async_session)):
-    return await TaskRepository(session).get_task_by_id(task_id, user.id)
-
-@app.put("/tasks/{task_id}")
-async def update_task(task_id: int,
-                      task_data: TaskUpdate,
-                      user: UserRead = Depends(current_active_user),
-                      session: AsyncSession = Depends(get_async_session)):
-    return await TaskRepository(session).update_task(task_id, task_data, user.id)
-
-@app.delete("/tasks/{task_id}", response_model=TaskRead)
-async def delete_task(task_id: int,
-                      user: UserRead = Depends(current_active_user),
-                      session: AsyncSession = Depends(get_async_session)):
-    return await TaskRepository(session).delete_task(task_id, user.id)
+app.include_router(tasks_router)
 
 if __name__ == "__main__":
     uvicorn.run("app.main:app", host="0.0.0.0", log_level="info")
