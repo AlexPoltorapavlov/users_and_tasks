@@ -9,39 +9,16 @@ from app.auth.auth import (
     auth_backend,
     UserManager,
     get_user_manager,
-    fastapi_users,
     current_active_user,
 )
 from app.routes import authenticated_router
 from app.models.models import User
 from app.db import get_user_db
 from app.config import config
-from app.schemas.users import UserCreate, UserRead, UserUpdate
+
+from .conftest import app, mock_user_db
 
 SECRET = config.JWT_SECRET_KEY
-
-# Мокируем зависимости
-@pytest.fixture
-def mock_user_db():
-    with patch("app.db.get_user_db") as mock:
-        yield mock
-
-@pytest.fixture
-def mock_user_manager(mock_user_db):
-    with patch("app.auth.auth.UserManager") as mock:
-        yield mock
-
-@pytest.fixture
-def app():
-    app = FastAPI()
-    app.include_router(fastapi_users.get_auth_router(auth_backend), prefix="/auth/jwt")
-    app.include_router(fastapi_users.get_register_router(UserRead, UserCreate), prefix="/auth")
-    app.include_router(authenticated_router)
-    return app
-
-@pytest.fixture
-def client(app):
-    return TestClient(app)
 
 # Тестируем get_jwt_strategy
 def test_get_jwt_strategy():
