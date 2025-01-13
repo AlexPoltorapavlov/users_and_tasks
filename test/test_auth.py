@@ -107,30 +107,39 @@ async def test_login_endpoint(client):
         id=1,
         email="test@example.com",
         is_active=True,
-        hashed_password="$argon2id$v=19$m=65536,t=3,p=4$7HlWFmfWt5jJvk0xwHjqDw$rkE8ijI0NAuZVkEOlBAziopL5Jzmvvuc4A7DIPRfvHc",
+        hashed_password="$argon2id$v=19$m=65536,t=3,p=4$jnx9MxgXVPQi2v4qPRqp0Q$lJALRPOTccij1hx7KQL0bsAfIpOftkn3tpAuvg9fbGU",
         is_superuser=False,
         is_verified=False,
     )
 
-    # Use dependency override
     login_data = {
-        "username": "test@example.com",
-        "password": "test"
+        "username": "user@example.com",
+        "password": "string"
     }
-    response = client.post("/auth/jwt/login", json=login_data)
+    response = client.post("/auth/jwt/login", data=login_data)
     print(response.json())
     assert response.status_code == 200
 
 @pytest.mark.asyncio
 async def test_current_active_user(client):
-    user = User(id=1, email="test@example.com", is_active=True)
+    user = User(
+        id=1,
+        email="test@example.com",
+        is_active=True,
+        hashed_password="$argon2id$v=19$m=65536,t=3,p=4$jnx9MxgXVPQi2v4qPRqp0Q$lJALRPOTccij1hx7KQL0bsAfIpOftkn3tpAuvg9fbGU",
+        is_superuser=False,
+        is_verified=False,
+    )
+
     user_manager = AsyncMock()
     user_manager.get_current_user.return_value = user
+    
+    print(user.id)
 
     # Generate a valid JWT token
     from app.auth.auth import get_jwt_strategy
     strategy = get_jwt_strategy()
-    token = strategy.write_token({"sub": str(user.id)})
+    token = await strategy.write_token(user)
 
     response = client.get("/authenticated-route", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 200
