@@ -21,6 +21,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 # routes
 from app.routes import authenticated_router
 from .routes.tasks import router as tasks_router
+from .routes.users import router as users_router
 
 app = FastAPI()
 
@@ -49,6 +50,11 @@ app.include_router(
 )
 app.include_router(authenticated_router)
 app.include_router(tasks_router)
+app.include_router(
+    users_router,
+    prefix='',
+    tags=["users"]
+)
 
 if __name__ == "__main__":
     uvicorn.run("app.main:app", host="0.0.0.0", log_level="info")
