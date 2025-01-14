@@ -20,6 +20,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 # Routes
 from .routes.tasks import router as tasks_router
+from .routes.users import router as users_router
 
 app = FastAPI()
 
@@ -47,6 +48,11 @@ app.include_router(
     tags=["users"],
 )
 app.include_router(tasks_router)
+app.include_router(
+    users_router,
+    prefix='',
+    tags=["users"]
+)
 
 @app.get("/authenticated-route")
 async def authenticated_route(user: User = Depends(current_active_user)):
