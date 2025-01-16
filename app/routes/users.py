@@ -13,7 +13,6 @@ def is_admin(user = Depends(current_active_user)):
 
 @router.post('/users')
 async def user_create(user_data: UserCreate,
-                      session: AsyncSession = Depends(get_async_session),
                       admin = Depends(is_admin),
                       user_manager = Depends(get_user_manager)):
     if admin:

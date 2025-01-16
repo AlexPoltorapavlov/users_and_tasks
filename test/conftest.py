@@ -18,9 +18,12 @@ import fastapi_users
 # Local modules
 from app.auth.auth import auth_backend
 from app.routes import authenticated_router
+from app.routes.tasks import router as tasks_router
+from app.routes.users import router as users_router
 from app.schemas.users import *
 from app.auth.auth import fastapi_users
 from app.models.models import Base
+from app.db import get_async_session
 
 @pytest.fixture
 def mock_user_db():
@@ -58,6 +61,8 @@ def app():
     app.include_router(fastapi_users.get_auth_router(auth_backend), prefix="/auth/jwt")
     app.include_router(fastapi_users.get_register_router(UserRead, UserCreate), prefix="/auth")
     app.include_router(authenticated_router)
+    app.include_router(tasks_router)
+    app.include_router(users_router)
     return app
 
 
