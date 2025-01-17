@@ -78,46 +78,69 @@ async def test_auth_backend():
 # Тестируем endpoint /auth/jwt/login
 @pytest.mark.asyncio
 async def test_login_endpoint(client):
-    # Mock UserManager
-    user_manager = AsyncMock()
-    user_manager.authenticate.return_value = User(
-        id=1,
-        email="test@example.com",
-        is_active=True,
-        hashed_password="$argon2id$v=19$m=65536,t=3,p=4$jnx9MxgXVPQi2v4qPRqp0Q$lJALRPOTccij1hx7KQL0bsAfIpOftkn3tpAuvg9fbGU",
-        is_superuser=False,
-        is_verified=False,
-    )
+    test_user_data = {
+        "id": 2,
+        "name": "string",
+        "tasks": [],
+        "email": "user1@example.com",
+        "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$iRKZ1XhGsZkyZ3BnC32Kgw$VFBGwBZ6qkF9B1s0/Dy/H+bXPGnu2bstP0MzNxAzVgQ",
+        "is_active": True,
+        "is_superuser": True,
+        "is_verified": False
+    }
 
+    mock_user = User(**test_user_data)
+
+    # Mock the database
+    test_db = AsyncMock()
+    test_db.get = AsyncMock(return_value=mock_user)
+    mock_user_manager = UserManager(test_db)
+
+    # Make the login request
     login_data = {
-        "username": "user@example.com",
+        "username": "user1@example.com",
         "password": "string"
     }
-    response = client.post("/auth/jwt/login", data=login_data)
-    print(response.json())
-    assert response.status_code == 200
+
+    with patch("app.auth.auth.get_user_manager", return_value=mock_user_manager):
+        response = client.post("/auth/jwt/login", data=login_data)
+        print(response.json())
+        assert response.status_code == 200
 
 @pytest.mark.asyncio
 async def test_current_active_user(client):
-    user = User(
-        id=1,
-        email="test@example.com",
-        is_active=True,
-        hashed_password="$argon2id$v=19$m=65536,t=3,p=4$jnx9MxgXVPQi2v4qPRqp0Q$lJALRPOTccij1hx7KQL0bsAfIpOftkn3tpAuvg9fbGU",
-        is_superuser=False,
-        is_verified=False,
-    )
+    test_user_data = {
+        "id": 2,
+        "name": "string",
+        "tasks": [],
+        "email": "user1@example.com",
+        "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$iRKZ1XhGsZkyZ3BnC32Kgw$VFBGwBZ6qkF9B1s0/Dy/H+bXPGnu2bstP0MzNxAzVgQ",
+        "is_active": True,
+        "is_superuser": True,
+        "is_verified": False
+    }
 
-    user_manager = AsyncMock()
-    user_manager.get_current_user.return_value = user
-    
-    print(user.id)
+    mock_user = User(**test_user_data)
 
-    # Generate a valid JWT token
-    from app.auth.auth import get_jwt_strategy
-    strategy = get_jwt_strategy()
-    token = await strategy.write_token(user)
+    # Mock the database
+    test_db = AsyncMock()
+    test_db.get = AsyncMock(return_value=mock_user)
+    mock_user_manager = UserManager(test_db)
 
-    response = client.get("/authenticated-route", headers={"Authorization": f"Bearer {token}"})
-    assert response.status_code == 200
-    assert response.json() == {"message": "You are authenticated", "user_id": 1}
+    # Make the login request
+    login_data = {
+        "username": "user1@example.com",
+        "password": "string"
+    }
+
+    with patch('app.auth.auth.get_user_manager', return_value=mock_user_manager):
+        response = client.post("/auth/jwt/login", data=login_data)
+        auth_token = response.json()["access_token"]
+        print(auth_token)
+        headers = {"Authorization": f"Bearer {auth_token}"}
+        response = client.get("/authenticated-route", headers=headers)
+        print(response.json())
+        assert response.status_code == 200
+        assert response.json() == {"message": "You are authenticated", "user_id": 2}
+
+
