@@ -1,4 +1,5 @@
 from fastapi_users.authentication import JWTStrategy, BearerTransport, AuthenticationBackend
+from sqlalchemy import select
 from ..config import config
 from fastapi import Depends, Request
 from fastapi_users import BaseUserManager, FastAPIUsers
@@ -47,8 +48,16 @@ class UserManager(BaseUserManager[User, int]):
         else:
             await super().on_after_request_verify(user, token, request)
 
+    async def get_all_users(self):
+        async with self.user_db.session as session:
+            result = await session.execute(select(User))
+            users = result.scalars().all()
+            return users
+
+
     def parse_id(self, value):
         return int(value)
+
 
 async def get_user_manager(user_db=Depends(get_user_db)):
     yield UserManager(user_db)

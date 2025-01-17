@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, status
 from fastapi.exceptions import HTTPException
 from app.schemas.users import UserCreate, UserRead
+from app.models.models import User
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db import get_async_session
 from app.auth.auth import current_active_user, get_user_manager
@@ -45,6 +46,17 @@ async def user_create(user_data: UserCreate,
         except UserAlreadyExists:
             raise HTTPException(status_code=status.HTTP_409_CONFLICT,
                                 detail="User already exist")
+    else:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="The appropriate level of execution permission has not been granted.")
+
+
+@router.get('/users')
+async def get_users(user_manager = Depends(get_user_manager),
+                    admin = Depends(is_admin)):
+    if admin:
+        result = await user_manager.get_all_users()
+        return result
     else:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="The appropriate level of execution permission has not been granted.")

@@ -142,5 +142,3 @@ async def test_current_active_user(client):
         print(response.json())
         assert response.status_code == 200
         assert response.json() == {"message": "You are authenticated", "user_id": 2}
-
-
