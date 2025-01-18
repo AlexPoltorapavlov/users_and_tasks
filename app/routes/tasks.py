@@ -36,7 +36,7 @@ async def get_all_tasks(user: UserRead = Depends(current_active_user),
     Returns:
         list[TaskRead]: A list of tasks associated with the authenticated user.
     """
-    return await TaskRepository(session).get_tasks(user.id)
+    return await TaskRepository(session).get_tasks(user.id, user.is_superuser)
 
 @router.get("/{task_id}")
 async def get_task(task_id: int,
@@ -52,7 +52,7 @@ async def get_task(task_id: int,
     Returns:
         TaskRead | None: The task if found, otherwise None.
     """
-    return await TaskRepository(session).get_task_by_id(task_id, user.id)
+    return await TaskRepository(session).get_task_by_id(task_id, user.id, user.is_superuser)
 
 @router.put("/{task_id}")
 async def update_task(task_id: int,

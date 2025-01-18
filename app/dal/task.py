@@ -32,31 +32,41 @@ class TaskRepository:
         await self.session.refresh(task)
         return task
 
-    async def get_tasks(self, user_id: int):
+    async def get_tasks(self, user_id: int, is_admin: bool = False):
         """Retrieves all tasks associated with a specific user.
 
         Args:
             user_id (int): The ID of the user whose tasks are to be retrieved.
+            is_admin (bool): The role of user
 
         Returns:
-            list[Task]: A list of task objects associated with the user.
+            list[Task]: A list of task objects associated with the user or all task objects if user is admin.
         """
-        result = await self.session.execute(select(Task).where(Task.user_id == user_id))
-        return result.scalars().all()
+        if is_admin:
+            result = await self.session.execute(select(Task))
+            return result.scalars().all()
+        else:
+            result = await self.session.execute(select(Task).where(Task.user_id == user_id))
+            return result.scalars().all()
 
-    async def get_task_by_id(self, task_id: int, user_id: int):
+    async def get_task_by_id(self, task_id: int, user_id: int, is_admin: bool = False):
         """Retrieves a specific task by its ID and user ID.
 
         Args:
             task_id (int): The ID of the task to retrieve.
             user_id (int): The ID of the user associated with the task.
+            is_admin (bool): The role of user
 
         Returns:
             Task | None: The task object if found, otherwise None.
         """
-        result = await self.session.execute(select(Task).where(Task.id == task_id, Task.user_id == user_id))
-        task = result.scalar_one_or_none()
-        return task if task else None
+        if is_admin:
+            result = await self.session.execute(select(Task).where(Task.id == task_id))
+            return result.scalar_one_or_none()
+        else:
+            result = await self.session.execute(select(Task).where(Task.id == task_id, Task.user_id == user_id))
+            task = result.scalar_one_or_none()
+            return task if task else None
 
     async def update_task(self, task_id: int, task_data: TaskUpdate, user_id: int):
         """Updates an existing task in the database.
