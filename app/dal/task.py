@@ -16,7 +16,7 @@ class TaskRepository:
         """
         self.session = session
 
-    async def create_task(self, task_data: TaskCreate, user_id: int):
+    async def create_task(self, task_data: TaskCreate):
         """Creates a new task in the database.
 
         Args:
@@ -26,7 +26,7 @@ class TaskRepository:
         Returns:
             Task: The newly created task object.
         """
-        task = Task(**task_data.model_dump(), user_id = user_id)
+        task = Task(**task_data.model_dump())
         self.session.add(task)
         await self.session.commit()
         await self.session.refresh(task)

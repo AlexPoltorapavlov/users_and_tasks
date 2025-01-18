@@ -8,10 +8,22 @@ from ..auth.auth import current_active_user
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
+def check_is_admin(user: UserRead = Depends(current_active_user)):
+    """Check if the user is an admin.
+
+    Args:
+        user (UserRead): The authenticated user.
+
+    Returns:
+        bool: True if the user is an admin, False otherwise.
+    """
+    return user.is_superuser
+
 @router.post("/", response_model=TaskRead)
 async def create_task(task: TaskCreate,
                       user: UserRead = Depends(current_active_user),
-                      session: AsyncSession = Depends(get_async_session)):
+                      session: AsyncSession = Depends(get_async_session),
+                      is_admin: bool = Depends(check_is_admin)):
     """Create a new task.
 
     Args:
@@ -22,7 +34,11 @@ async def create_task(task: TaskCreate,
     Returns:
         TaskRead: The newly created task.
     """
-    return await TaskRepository(session).create_task(task_data=task, user_id=user.id)
+    if is_admin and task.user_id is not None:
+        return await TaskRepository(session).create_task(task_data=task)
+    else:
+        task.user_id = user.id
+    return await TaskRepository(session).create_task(task_data=task)
 
 @router.get("/")
 async def get_all_tasks(user: UserRead = Depends(current_active_user),

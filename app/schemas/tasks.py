@@ -35,7 +35,8 @@ class TaskCreate(BaseModel):
     """The description of the task."""
     status: Optional[StatusEnum] = StatusEnum.new
     """The status of the task. Defaults to 'new' if not provided."""
-
+    user_id: Optional[int] = None
+    """The ID of the user. Optional."""
 
 class TaskUpdate(BaseModel):
     """Schema for updating an existing task."""
