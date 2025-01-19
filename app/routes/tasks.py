@@ -30,6 +30,7 @@ async def create_task(task: TaskCreate,
         task (TaskCreate): The task data to be created.
         user (UserRead): The authenticated user, automatically injected by the `current_active_user` dependency.
         session (AsyncSession): The async database session, automatically injected by the `get_async_session` dependency.
+        is_admin (bool): Check a role of user
 
     Returns:
         TaskRead: The newly created task.
@@ -42,39 +43,50 @@ async def create_task(task: TaskCreate,
 
 @router.get("/")
 async def get_all_tasks(user: UserRead = Depends(current_active_user),
-                        session: AsyncSession = Depends(get_async_session)):
+                        session: AsyncSession = Depends(get_async_session),
+                        is_admin: bool = Depends(check_is_admin)):
     """Retrieve all tasks for the authenticated user.
 
     Args:
         user (UserRead): The authenticated user, automatically injected by the `current_active_user` dependency.
         session (AsyncSession): The async database session, automatically injected by the `get_async_session` dependency.
+        is_admin (bool): Check a role of user
 
     Returns:
         list[TaskRead]: A list of tasks associated with the authenticated user.
     """
-    return await TaskRepository(session).get_tasks(user.id, user.is_superuser)
+    if is_admin:
+        return await TaskRepository(session).get_all_tasks()
+    else:
+        return await TaskRepository(session).get_tasks(user.id)
 
 @router.get("/{task_id}")
 async def get_task(task_id: int,
                    user: UserRead = Depends(current_active_user),
-                   session: AsyncSession = Depends(get_async_session)):
+                   session: AsyncSession = Depends(get_async_session),
+                   is_admin: bool = Depends(check_is_admin)):
     """Retrieve a specific task by its ID.
 
     Args:
         task_id (int): The ID of the task to retrieve.
         user (UserRead): The authenticated user, automatically injected by the `current_active_user` dependency.
         session (AsyncSession): The async database session, automatically injected by the `get_async_session` dependency.
+        is_admin (bool): Check a role of user
 
     Returns:
         TaskRead | None: The task if found, otherwise None.
     """
-    return await TaskRepository(session).get_task_by_id(task_id, user.id, user.is_superuser)
+    if is_admin:
+        return await TaskRepository(session).get_specific_task_by_id(task_id)
+    else:
+        return await TaskRepository(session).get_task_by_id(task_id, user.id)
 
 @router.put("/{task_id}")
 async def update_task(task_id: int,
                       task_data: TaskUpdate,
                       user: UserRead = Depends(current_active_user),
-                      session: AsyncSession = Depends(get_async_session)):
+                      session: AsyncSession = Depends(get_async_session),
+                      is_admin: bool = Depends(check_is_admin)):
     """Update an existing task.
 
     Args:
@@ -82,25 +94,34 @@ async def update_task(task_id: int,
         task_data (TaskUpdate): The updated task data.
         user (UserRead): The authenticated user, automatically injected by the `current_active_user` dependency.
         session (AsyncSession): The async database session, automatically injected by the `get_async_session` dependency.
+        is_admin (bool): Check a role of user
 
     Returns:
         TaskRead | None: The updated task if found, otherwise None.
     """
-    return await TaskRepository(session).update_task(task_id, task_data, user.id)
+    if is_admin:
+        return await TaskRepository(session).update_specific_task(task_id, task_data)
+    else:
+        return await TaskRepository(session).update_task(task_id, task_data, user.id)
 
 @router.delete("/{task_id}")
 async def delete_task(task_id: int,
                       user: UserRead = Depends(current_active_user),
-                      session: AsyncSession = Depends(get_async_session)):
+                      session: AsyncSession = Depends(get_async_session),
+                      is_admin: bool = Depends(check_is_admin)):
     """Delete a task by its ID.
 
     Args:
         task_id (int): The ID of the task to delete.
         user (UserRead): The authenticated user, automatically injected by the `current_active_user` dependency.
         session (AsyncSession): The async database session, automatically injected by the `get_async_session` dependency.
+        is_admin (bool): Check a role of user
 
     Returns:
         TaskRead | None: The deleted task if found, otherwise None.
     """
-    return await TaskRepository(session).delete_task(task_id, user.id)
+    if is_admin:
+        return await TaskRepository(session).delete_specific_task(task_id)
+    else:
+        return await TaskRepository(session).delete_task(task_id, user.id)
 

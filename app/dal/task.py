@@ -32,7 +32,7 @@ class TaskRepository:
         await self.session.refresh(task)
         return task
 
-    async def get_tasks(self, user_id: int, is_admin: bool = False):
+    async def get_tasks(self, user_id: int):
         """Retrieves all tasks associated with a specific user.
 
         Args:
@@ -42,14 +42,19 @@ class TaskRepository:
         Returns:
             list[Task]: A list of task objects associated with the user or all task objects if user is admin.
         """
-        if is_admin:
-            result = await self.session.execute(select(Task))
-            return result.scalars().all()
-        else:
-            result = await self.session.execute(select(Task).where(Task.user_id == user_id))
-            return result.scalars().all()
+        result = await self.session.execute(select(Task).where(Task.user_id == user_id))
+        return result.scalars().all()
 
-    async def get_task_by_id(self, task_id: int, user_id: int, is_admin: bool = False):
+    async def get_all_tasks(self):
+        """Retrieves all tasks from the database.
+
+        Returns:
+            list[Task]: A list of all task objects.
+        """
+        result = await self.session.execute(select(Task))
+        return result.scalars().all()
+
+    async def get_task_by_id(self, task_id: int, user_id: int):
         """Retrieves a specific task by its ID and user ID.
 
         Args:
@@ -60,13 +65,22 @@ class TaskRepository:
         Returns:
             Task | None: The task object if found, otherwise None.
         """
-        if is_admin:
-            result = await self.session.execute(select(Task).where(Task.id == task_id))
-            return result.scalar_one_or_none()
-        else:
-            result = await self.session.execute(select(Task).where(Task.id == task_id, Task.user_id == user_id))
-            task = result.scalar_one_or_none()
-            return task if task else None
+        result = await self.session.execute(select(Task).where(Task.id == task_id, Task.user_id == user_id))
+        task = result.scalar_one_or_none()
+        return task if task else None
+
+    async def get_specific_task_by_id(self, task_id: int):
+        """Retrieves a specific task by its ID.
+
+        Args:
+            task_id (int): The ID of the task to retrieve.
+
+        Returns:
+            Task | None: The task object if found, otherwise None.
+        """
+        result = await self.session.execute(select(Task).where(Task.id == task_id))
+        task = result.scalar_one_or_none()
+        return task if task else None
 
     async def update_task(self, task_id: int, task_data: TaskUpdate, user_id: int):
         """Updates an existing task in the database.
@@ -80,6 +94,27 @@ class TaskRepository:
             Task | None: The updated task object if found, otherwise None.
         """
         task = await self.get_task_by_id(task_id, user_id)
+        if task is None:
+            return None
+
+        for key, value in task_data.model_dump(exclude_unset=True).items():
+            setattr(task, key, value)
+
+        await self.session.commit()
+        await self.session.refresh(task)
+        return task
+
+    async def update_specific_task(self, task_id: int, task_data: TaskUpdate):
+        """Updates an existing task in the database.
+
+        Args:
+            task_id (int): The ID of the task to update.
+            task_data (TaskUpdate): The updated task data.
+
+        Returns:
+            Task | None: The updated task object if found, otherwise None.
+        """
+        task = await self.get_specific_task_by_id(task_id)
         if task is None:
             return None
 
@@ -104,6 +139,23 @@ class TaskRepository:
         if task is None:
             return None
         
+        await self.session.delete(task)
+        await self.session.commit()
+        return task
+    
+    async def delete_specific_task(self, task_id: int):
+        """Deletes a task from the database.
+
+        Args:
+            task_id (int): The ID of the task to delete.
+
+        Returns:
+            Task | None: The deleted task object if found, otherwise None.
+        """
+        task = await self.get_specific_task_by_id(task_id)
+        if task is None:
+            return None
+
         await self.session.delete(task)
         await self.session.commit()
         return task
