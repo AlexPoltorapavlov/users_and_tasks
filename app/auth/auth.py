@@ -7,7 +7,7 @@ from fastapi_users import BaseUserManager, FastAPIUsers
 from app.models.models import User
 from app.db import get_user_db
 
-from typing import Optional
+from typing import Optional, List
 
 bearer_transport = BearerTransport(tokenUrl="auth/jwt/login")
 
@@ -50,7 +50,6 @@ class UserManager(BaseUserManager[User, int]):
 
     async def get_all_users(self):
         return await self.user_db.get_all_users()
-
     def parse_id(self, value):
         return int(value)
 

@@ -1,13 +1,17 @@
 import pytest
-from unittest.mock import patch
-
-@pytest.fixture(scope="function")
-def mock_user():
-    from app.auth.auth import User
-    return User(id=1, email="test@test.com", hashed_password="hashed_password", is_active=True, is_superuser=False, is_verified=False)
+from app.auth.auth import (
+    UserManager,
+    get_jwt_strategy,
+    get_user_manager,
+    fastapi_users
+)
+from fastapi import Depends
+from fastapi.exceptions import HTTPException
+from unittest.mock import patch, AsyncMock, MagicMock
+from fastapi_users.db import BaseUserDatabase
+from tests import conftest
 
 def test_get_jwt_strategy():
-    from app.auth.auth import get_jwt_strategy
     SECRET = "SECRET"
 
     with patch("app.auth.auth.SECRET", SECRET):
@@ -17,9 +21,66 @@ def test_get_jwt_strategy():
         assert jwt_strategy.token_audience == ["fastapi-users:auth"]
         assert jwt_strategy.algorithm == "HS256"
 
-def test_parse_id(mock_user):
-    from app.auth.auth import UserManager
-    user_manager = UserManager(mock_user)
+@pytest.mark.asyncio
+async def test_get_user_manager_edge_case_empty_user_db():
+    user_manager_generator = get_user_manager()
+    user_manager = await user_manager_generator.__anext__()
+    assert isinstance(user_manager, UserManager)
+    print(user_manager.get_all_users())
+    assert 1 == 0
+
+
+@pytest.mark.asyncio
+async def test_get_user_manager_returns_user_manager():
+    mock_user_db = MagicMock()
+    mock_get_user_db = MagicMock(return_value=mock_user_db)
+
+    with patch('app.auth.auth.get_user_db', mock_get_user_db):
+        user_manager_generator = get_user_manager()
+        user_manager = await anext(user_manager_generator)
+
+        assert isinstance(user_manager, UserManager)
+        assert user_manager.user_db == mock_user_db
+
+    mock_get_user_db.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_get_user_manager_with_exception_in_dependency():
+    def mock_get_user_db():
+        raise HTTPException(status_code=500, detail="Database error")
+
+    with pytest.raises(HTTPException):
+        async for _ in get_user_manager(Depends(mock_get_user_db)):
+            pass
+
+
+@pytest.mark.asyncio
+async def test_get_user_manager_with_invalid_input():
+    with pytest.raises(TypeError):
+        async for _ in get_user_manager("invalid_input"):
+            pass
+
+
+@pytest.mark.asyncio
+async def test_get_user_manager_with_invalid_user_db():
+    invalid_user_db = object()  # An object that doesn't have the required methods
+
+    with pytest.raises(AttributeError):
+        async for user_manager in get_user_manager(invalid_user_db):
+            await user_manager.get_all_users()
+
+
+@pytest.mark.asyncio
+async def test_get_user_manager_with_none_input():
+    with pytest.raises(TypeError):
+        async for _ in get_user_manager(None):
+            pass
+
+
+def test_parse_id():
+    mock_user_db = AsyncMock()
+    user_manager = UserManager(mock_user_db)
 
     assert user_manager.parse_id(2) == 2
     assert user_manager.parse_id("2") == 2
