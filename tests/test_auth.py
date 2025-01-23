@@ -23,12 +23,13 @@ def test_get_jwt_strategy():
 
 @pytest.mark.asyncio
 async def test_get_user_manager_edge_case_empty_user_db():
-    user_manager_generator = get_user_manager()
-    user_manager = await user_manager_generator.__anext__()
-    assert isinstance(user_manager, UserManager)
-    print(user_manager.get_all_users())
-    assert 1 == 0
+    mock_user_repository = AsyncMock()
+    mock_user_repository.get_all_users.return_value = []
+    user_manager = UserManager(user_db=mock_user_repository)
 
+    result = await user_manager.get_all_users()
+    assert isinstance(user_manager, UserManager)
+    assert result == []
 
 @pytest.mark.asyncio
 async def test_get_user_manager_returns_user_manager():
