@@ -12,7 +12,7 @@ Create a `.env` file in the root directory with the following variables:
 
 ```
 DATABASE_URL="sqlite+aiosqlite:///database.db"
-JWT_SECRET_KEY=your-secret-key
+JWT_SECRET_KEY="your-secret-key"
 ```
 
 ## Installation
@@ -25,8 +25,11 @@ cd users_and_tasks
 
 2. Set up a virtual environment (optional but recommended):
 ```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+poetry env use python
+```
+or
+```bash
+poetry env use /path/to/python/of/specific/version
 ```
 
 3. Install dependencies:

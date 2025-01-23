@@ -49,11 +49,7 @@ class UserManager(BaseUserManager[User, int]):
             await super().on_after_request_verify(user, token, request)
 
     async def get_all_users(self):
-        async with self.user_db.session as session:
-            result = await session.execute(select(User))
-            users = result.scalars().all()
-            return users
-
+        return await self.user_db.get_all_users()
 
     def parse_id(self, value):
         return int(value)
