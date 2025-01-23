@@ -2,7 +2,7 @@ from collections.abc import AsyncGenerator
 from .config import config
 
 from fastapi import Depends
-from fastapi_users.db import SQLAlchemyUserDatabase
+from app.dal.user import UserRepository
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from .models.models import User, Base
@@ -47,4 +47,4 @@ async def get_user_db(session: AsyncSession = Depends(get_async_session)):
     Returns:
         SQLAlchemyUserDatabase: An instance of `SQLAlchemyUserDatabase` for managing user-related database operations.
     """
-    yield SQLAlchemyUserDatabase(session, User)
+    yield UserRepository(session, User)
