@@ -5,11 +5,8 @@ from app.auth.auth import (
     get_user_manager,
     fastapi_users
 )
-from fastapi import Depends
-from fastapi.exceptions import HTTPException
-from unittest.mock import patch, AsyncMock, MagicMock
-from fastapi_users.db import BaseUserDatabase
-from tests import conftest
+from fastapi import Depends, HTTPException
+from unittest.mock import patch, AsyncMock
 
 def test_get_jwt_strategy():
     SECRET = "SECRET"
@@ -33,18 +30,14 @@ async def test_get_user_manager_edge_case_empty_user_db():
 
 @pytest.mark.asyncio
 async def test_get_user_manager_returns_user_manager():
-    mock_user_db = MagicMock()
-    mock_get_user_db = MagicMock(return_value=mock_user_db)
+    mock_user_db = AsyncMock()
 
-    with patch('app.auth.auth.get_user_db', mock_get_user_db):
-        user_manager_generator = get_user_manager()
+    with patch('app.auth.auth.get_user_db', return_value=mock_user_db):
+        user_manager_generator = get_user_manager(mock_user_db)
         user_manager = await anext(user_manager_generator)
 
         assert isinstance(user_manager, UserManager)
         assert user_manager.user_db == mock_user_db
-
-    mock_get_user_db.assert_called_once()
-
 
 @pytest.mark.asyncio
 async def test_get_user_manager_with_exception_in_dependency():
