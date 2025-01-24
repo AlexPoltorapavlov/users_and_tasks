@@ -55,7 +55,7 @@ async def user_create(user_data: UserCreate,
 async def get_users(user_manager = Depends(get_user_manager),
                     admin = Depends(is_admin)):
     if admin:
-        result = await user_manager.get_all_users()
+        result = await user_manager.get_all()
         return result
     else:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,

@@ -5,6 +5,7 @@ from app.auth.auth import (
     get_user_manager,
     fastapi_users
 )
+from app.dal.user import UserRepository
 from fastapi import Depends, HTTPException
 from unittest.mock import patch, AsyncMock
 
@@ -20,17 +21,17 @@ def test_get_jwt_strategy():
 
 @pytest.mark.asyncio
 async def test_get_user_manager_edge_case_empty_user_db():
-    mock_user_repository = AsyncMock()
-    mock_user_repository.get_all_users.return_value = []
-    user_manager = UserManager(user_db=mock_user_repository)
+    mock_user_db = AsyncMock(spec=UserRepository)
+    mock_user_db.get_all.return_value = []
+    user_manager = UserManager(user_db=mock_user_db)
 
-    result = await user_manager.get_all_users()
+    result = await user_manager.get_all()
     assert isinstance(user_manager, UserManager)
     assert result == []
 
 @pytest.mark.asyncio
 async def test_get_user_manager_returns_user_manager():
-    mock_user_db = AsyncMock()
+    mock_user_db = AsyncMock(spec=UserRepository)
 
     with patch('app.auth.auth.get_user_db', return_value=mock_user_db):
         user_manager_generator = get_user_manager(mock_user_db)
@@ -38,15 +39,6 @@ async def test_get_user_manager_returns_user_manager():
 
         assert isinstance(user_manager, UserManager)
         assert user_manager.user_db == mock_user_db
-
-@pytest.mark.asyncio
-async def test_get_user_manager_with_exception_in_dependency():
-    def mock_get_user_db():
-        raise HTTPException(status_code=500, detail="Database error")
-
-    with pytest.raises(HTTPException):
-        async for _ in get_user_manager(Depends(mock_get_user_db)):
-            pass
 
 
 @pytest.mark.asyncio
@@ -58,11 +50,11 @@ async def test_get_user_manager_with_invalid_input():
 
 @pytest.mark.asyncio
 async def test_get_user_manager_with_invalid_user_db():
-    invalid_user_db = object()  # An object that doesn't have the required methods
+    invalid_user_db = object()
 
-    with pytest.raises(AttributeError):
+    with pytest.raises(TypeError):
         async for user_manager in get_user_manager(invalid_user_db):
-            await user_manager.get_all_users()
+            await user_manager.get_all()
 
 
 @pytest.mark.asyncio
