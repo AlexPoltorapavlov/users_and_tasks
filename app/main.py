@@ -1,22 +1,13 @@
 import uvicorn
-from contextlib import asynccontextmanager
-from fastapi import Depends, FastAPI
-
-# db imports
-from .db import User, create_db_and_tables, get_async_session
+from fastapi import FastAPI
 
 # schemas import
 from .schemas.users import UserCreate, UserRead, UserUpdate
-from .schemas.tasks import TaskCreate, TaskRead, TaskUpdate
 
 # auth
-from .auth.auth import auth_backend, current_active_user, fastapi_users
-
-# Repositories
-from .repositories.task import TaskRepository
+from .auth.auth import auth_backend, fastapi_users
 
 # sqlalchemy
-from sqlalchemy.ext.asyncio import AsyncSession
 
 # routes
 from app.routes import authenticated_router
