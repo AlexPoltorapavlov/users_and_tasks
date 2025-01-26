@@ -2,10 +2,10 @@ from collections.abc import AsyncGenerator
 from .config import config
 
 from fastapi import Depends
-from app.dal.user import UserRepository
+from app.dal import UserRepository, TaskRepository
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from .models.models import User, Base
+from .models.models import Task, User, Base
 
 
 DATABASE_URL = config.DATABASE_URL
@@ -49,3 +49,14 @@ async def get_user_db(session: AsyncSession = Depends(get_async_session)):
         SQLAlchemyUserDatabase: An instance of `SQLAlchemyUserDatabase` for managing user-related database operations.
     """
     yield UserRepository(session, User)
+
+async def get_task_db(session: AsyncSession = Depends(get_async_session)):
+    """Dependency function to provide a TaskRepository instance with an async session.
+
+    Args:
+        session (AsyncSession): The async SQLAlchemy session (injected by FastAPI).
+
+    Yields:
+        TaskRepository: An instance of TaskRepository for handling task-related database operations.
+    """
+    yield TaskRepository(session, Task)

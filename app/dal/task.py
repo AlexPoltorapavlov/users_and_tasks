@@ -3,18 +3,21 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from ..models.models import Task
 from ..schemas.tasks import *
-from ..db import get_async_session
 
 class TaskRepository:
     """Repository class for handling database operations related to tasks."""
 
-    def __init__(self, session: AsyncSession):
+    def __init__(self,
+                 session: AsyncSession,
+                 task_table: Task):
         """Initializes the TaskRepository with an async database session.
 
         Args:
             session (AsyncSession): The async SQLAlchemy session for database operations.
+            task_table (Base(SQLAlchemy.orm.DeclarativeBase)): The task's model
         """
         self.session = session
+        self.task_table = task_table
 
     async def create_task(self, task_data: TaskCreate):
         """Creates a new task in the database.
@@ -26,7 +29,7 @@ class TaskRepository:
         Returns:
             Task: The newly created task object.
         """
-        task = Task(**task_data.model_dump())
+        task = self.task_table(**task_data.model_dump())
         self.session.add(task)
         await self.session.commit()
         await self.session.refresh(task)
@@ -42,7 +45,7 @@ class TaskRepository:
         Returns:
             list[Task]: A list of task objects associated with the user or all task objects if user is admin.
         """
-        result = await self.session.execute(select(Task).where(Task.user_id == user_id))
+        result = await self.session.execute(select(self.task_table).where(self.task_table.user_id == user_id))
         return result.scalars().all()
 
     async def get_all_tasks(self):
@@ -51,7 +54,7 @@ class TaskRepository:
         Returns:
             list[Task]: A list of all task objects.
         """
-        result = await self.session.execute(select(Task))
+        result = await self.session.execute(select(self.task_table))
         return result.scalars().all()
 
     async def get_task_by_id(self, task_id: int, user_id: int):
@@ -65,7 +68,7 @@ class TaskRepository:
         Returns:
             Task | None: The task object if found, otherwise None.
         """
-        result = await self.session.execute(select(Task).where(Task.id == task_id, Task.user_id == user_id))
+        result = await self.session.execute(select(self.task_table).where(self.task_table.id == task_id, self.task_table.user_id == user_id))
         task = result.scalar_one_or_none()
         return task if task else None
 
@@ -78,7 +81,7 @@ class TaskRepository:
         Returns:
             Task | None: The task object if found, otherwise None.
         """
-        result = await self.session.execute(select(Task).where(Task.id == task_id))
+        result = await self.session.execute(select(self.task_table).where(self.task_table.id == task_id))
         task = result.scalar_one_or_none()
         return task if task else None
 
@@ -142,7 +145,7 @@ class TaskRepository:
         await self.session.delete(task)
         await self.session.commit()
         return task
-    
+
     async def delete_specific_task(self, task_id: int):
         """Deletes a task from the database.
 
@@ -161,13 +164,5 @@ class TaskRepository:
         return task
 
 
-async def get_task_db(session: AsyncSession = Depends(get_async_session)):
-    """Dependency function to provide a TaskRepository instance with an async session.
 
-    Args:
-        session (AsyncSession): The async SQLAlchemy session (injected by FastAPI).
 
-    Yields:
-        TaskRepository: An instance of TaskRepository for handling task-related database operations.
-    """
-    yield TaskRepository(session)
