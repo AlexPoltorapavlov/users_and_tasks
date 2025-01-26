@@ -4,8 +4,8 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.pool import StaticPool
 from app.models.models import Base
-from app.dal.user import UserRepository
-from app.models.models import User
+from app.repositories.user import UserRepository
+from app.models.models import User, Task
 from pytest_asyncio import fixture as async_fixture
 
 # адрес к тестовой базе данных
@@ -42,6 +42,10 @@ async def session() -> AsyncGenerator:
 @async_fixture
 async def user_repository(session: AsyncSession) -> UserRepository:
     return UserRepository(session, User)
+
+@async_fixture
+async def task_repository(session: AsyncSession) -> TaskRepository:
+    return TaskRepository(session, Task)
 
 
 # usefull fixtures

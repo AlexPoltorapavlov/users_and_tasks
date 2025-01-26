@@ -1,4 +1,4 @@
-from app.dal import TaskRepository
+from app.repositories import TaskRepository
 from app.db import get_task_db
 from fastapi import Depends
 from app.schemas.tasks import TaskCreate, TaskUpdate, TaskRead

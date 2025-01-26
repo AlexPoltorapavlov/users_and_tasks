@@ -13,7 +13,7 @@ from .schemas.tasks import TaskCreate, TaskRead, TaskUpdate
 from .auth.auth import auth_backend, current_active_user, fastapi_users
 
 # Repositories
-from .dal.task import TaskRepository
+from .repositories.task import TaskRepository
 
 # sqlalchemy
 from sqlalchemy.ext.asyncio import AsyncSession

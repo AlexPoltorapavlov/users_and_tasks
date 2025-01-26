@@ -1,10 +1,14 @@
 import pytest
 import pytest_asyncio
 from unittest.mock import patch, AsyncMock, MagicMock
-from app.dal.user import UserRepository
+from app.repositories import UserRepository, TaskRepository
 from app.schemas.users import UserRead
-from app.models.models import User, Task  # Import all models to ensure tables are created  # Import all models to register with metadata
+from app.models.models import User, Task 
 from tests.mock_db import session, AsyncSession, user_repository, create_users, setup_db
+
+# ***************
+# UserRepository Testing
+# ***************
 
 @pytest.mark.asyncio
 async def test_get_all_empty_database(setup_db, user_repository: UserRepository):
@@ -46,3 +50,11 @@ async def test_get_by_id_nonexistent_user(user_repository: UserRepository):
 async def test_get_by_id_invalid_id(user_repository: UserRepository):
     user = await user_repository.get("invalid_id")
     assert user is None
+
+
+# ***************
+# TaskRepository Testing
+# ***************
+
+async def test_create_task():
+    pass

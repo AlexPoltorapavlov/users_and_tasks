@@ -5,7 +5,7 @@ from app.auth.auth import (
     get_user_manager,
     fastapi_users
 )
-from app.dal.user import UserRepository
+from app.repositories.user import UserRepository
 from fastapi import Depends, HTTPException
 from unittest.mock import patch, AsyncMock
 
