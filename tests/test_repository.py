@@ -1,5 +1,6 @@
 import pytest
 import pytest_asyncio
+from fastapi import HTTPException
 from unittest.mock import patch, AsyncMock, MagicMock
 from app.repositories import UserRepository, TaskRepository
 from tests.mock_db import session, user_repository, create_users, setup_db, task_repository
@@ -76,5 +77,5 @@ async def test_create_task_empty_query(task_repository: TaskRepository):
 async def test_create_task_nonexistent_user(task_repository: TaskRepository):
     task_data = {"name": "Name", "user_id": 999, "description": "Description", "status": "new"}
     task = TaskCreate(**task_data)
-    with pytest.raises(ValueError):
+    with pytest.raises(HTTPException):
         await task_repository.create_task(task)
