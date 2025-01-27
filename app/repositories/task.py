@@ -1,8 +1,23 @@
-from fastapi import Depends
+from fastapi import Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from ..models.models import Task, User
 from ..schemas.tasks import *
+
+def check_user_exists(func):
+    async def wrapper(self, *args, **kwargs):
+        """
+        kwargs.get("user_id") - user_id
+        or
+        args[0].user_id - user_id (args = tuple with TaskCreate)
+        """
+        user_id = kwargs.get("user_id") or args[0]
+        if not await self._check_user_exists(user_id):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                                detail="User does not exist")
+        else:
+            return await func(self, *args, **kwargs)
+    return wrapper
 
 class TaskRepository:
     """Repository class for handling database operations related to tasks."""
@@ -22,7 +37,7 @@ class TaskRepository:
         self.task_table = task_table
         self.user_table = user_table
 
-    async def _is_user(self, user_id: int):
+    async def _check_user_exists(self, user_id: int):
         """Checks if a user with the given ID exists in the database.
 
         Args:
@@ -31,12 +46,13 @@ class TaskRepository:
         Returns:
             bool: True if the user exists, False otherwise.
         """
-        try: 
+        try:
             result = await self.session.execute(select(self.user_table).where(self.user_table.id == user_id))
             return result.scalar_one_or_none() is not None
-        except Exception:
-            raise ValueError("Invalid user ID")
+        except:
+            return False
 
+    @check_user_exists
     async def create_task(self, task_data: TaskCreate):
         """Creates a new task in the database.
 
