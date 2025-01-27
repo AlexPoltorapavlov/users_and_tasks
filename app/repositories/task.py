@@ -11,7 +11,7 @@ def check_user_exists(func):
         or
         args[0].user_id - user_id (args = tuple with TaskCreate)
         """
-        user_id = kwargs.get("user_id") or args[0]
+        user_id = kwargs.get("user_id") or args[0].user_id
         if not await self._check_user_exists(user_id):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                                 detail="User does not exist")
