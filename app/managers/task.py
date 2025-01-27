@@ -35,6 +35,10 @@ class TaskManager:
         result = await self.task_db.update_specific_task(task_id, task_data)
         return TaskRead(**result.__dict__) if result else None
 
+    async def delete_task(self, task_id: int, user_id: int):
+        result = await self.task_db.delete_task(task_id, user_id)
+        return TaskRead(**result.__dict__) if result else None
+
     async def delete_specific_task(self, task_id: int):
         result = await self.task_db.delete_specific_task(task_id)
         return TaskRead(**result.__dict__) if result else None
