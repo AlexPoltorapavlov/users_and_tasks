@@ -1,9 +1,6 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
-from ..schemas.tasks import TaskRead, TaskCreate, TaskUpdate
-from ..schemas.users import UserRead
+from app.schemas import TaskRead, TaskCreate, TaskUpdate, UserRead
 from app.managers import get_task_manager
-from ..db import get_async_session
 from ..auth.auth import current_active_user
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
@@ -33,7 +30,6 @@ async def create_task(task: TaskCreate,
 
 @router.get("/")
 async def get_all_tasks(user: UserRead = Depends(current_active_user),
-                        session: AsyncSession = Depends(get_async_session),
                         is_admin: bool = Depends(check_is_admin),
                         task_manager = Depends(get_task_manager)):
     if is_admin:
@@ -44,7 +40,6 @@ async def get_all_tasks(user: UserRead = Depends(current_active_user),
 @router.get("/{task_id}")
 async def get_task(task_id: int,
                    user: UserRead = Depends(current_active_user),
-                   session: AsyncSession = Depends(get_async_session),
                    is_admin: bool = Depends(check_is_admin),
                    task_manager = Depends(get_task_manager)):
 

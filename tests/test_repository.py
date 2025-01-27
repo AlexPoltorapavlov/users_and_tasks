@@ -2,9 +2,10 @@ import pytest
 import pytest_asyncio
 from unittest.mock import patch, AsyncMock, MagicMock
 from app.repositories import UserRepository, TaskRepository
-from app.schemas.users import UserRead
-from app.models.models import User, Task 
-from tests.mock_db import session, AsyncSession, user_repository, create_users, setup_db
+from tests.mock_db import session, user_repository, create_users, setup_db, task_repository
+from app.schemas.tasks import TaskCreate, TaskRead, TaskUpdate
+
+from app.models import Task
 
 # ***************
 # UserRepository Testing
@@ -56,5 +57,24 @@ async def test_get_by_id_invalid_id(user_repository: UserRepository):
 # TaskRepository Testing
 # ***************
 
-async def test_create_task():
-    pass
+@pytest.mark.asyncio
+async def test_create_task(task_repository: TaskRepository):
+    task_data = {"name": "Name", "user_id": 1, "description": "Description", "status": "new"}
+    task = TaskCreate(**task_data)
+    result = await task_repository.create_task(task)
+    assert isinstance(result, Task)
+    assert result.name == task_data["name"]
+    assert result.user_id == task_data["user_id"]
+    assert result.description == task_data["description"]
+
+@pytest.mark.asyncio
+async def test_create_task_empty_query(task_repository: TaskRepository):
+    task_data = {}
+    pytest.raises(ValueError, TaskCreate, **task_data)
+
+@pytest.mark.asyncio
+async def test_create_task_nonexistent_user(task_repository: TaskRepository):
+    task_data = {"name": "Name", "user_id": 999, "description": "Description", "status": "new"}
+    task = TaskCreate(**task_data)
+    with pytest.raises(ValueError):
+        await task_repository.create_task(task)

@@ -59,4 +59,4 @@ async def get_task_db(session: AsyncSession = Depends(get_async_session)):
     Yields:
         TaskRepository: An instance of TaskRepository for handling task-related database operations.
     """
-    yield TaskRepository(session, Task)
+    yield TaskRepository(session, Task, User)

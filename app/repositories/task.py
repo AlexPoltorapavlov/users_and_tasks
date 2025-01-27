@@ -1,7 +1,7 @@
 from fastapi import Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from ..models.models import Task
+from ..models.models import Task, User
 from ..schemas.tasks import *
 
 class TaskRepository:
@@ -9,7 +9,9 @@ class TaskRepository:
 
     def __init__(self,
                  session: AsyncSession,
-                 task_table: Task):
+                 task_table: Task,
+                 user_table: User):
+
         """Initializes the TaskRepository with an async database session.
 
         Args:
@@ -18,6 +20,22 @@ class TaskRepository:
         """
         self.session = session
         self.task_table = task_table
+        self.user_table = user_table
+
+    async def _is_user(self, user_id: int):
+        """Checks if a user with the given ID exists in the database.
+
+        Args:
+            user_id (int): The ID of the user to check.
+
+        Returns:
+            bool: True if the user exists, False otherwise.
+        """
+        try: 
+            result = await self.session.execute(select(self.user_table).where(self.user_table.id == user_id))
+            return result.scalar_one_or_none() is not None
+        except Exception:
+            raise ValueError("Invalid user ID")
 
     async def create_task(self, task_data: TaskCreate):
         """Creates a new task in the database.
@@ -162,7 +180,3 @@ class TaskRepository:
         await self.session.delete(task)
         await self.session.commit()
         return task
-
-
-
-
