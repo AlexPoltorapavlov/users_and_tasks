@@ -55,7 +55,7 @@ async def task_repository(session: AsyncSession) -> TaskRepository:
     """
     Репозиторий для взаимодействия СУБД с схемой задач
     """
-    return TaskRepository(session, Task)
+    return TaskRepository(session, Task, User)
 
 
 # usefull fixtures
