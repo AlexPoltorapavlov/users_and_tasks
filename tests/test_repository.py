@@ -66,6 +66,11 @@ async def test_get_by_id_invalid_id(user_repository: UserRepository):
 # ***************
 
 @pytest.mark.asyncio
+async def test_get_all_tasks_empty_database(task_repository: TaskRepository):
+    all_tasks = await task_repository.get_all_tasks()
+    assert all_tasks == []
+
+@pytest.mark.asyncio
 async def test_create_task(task_repository: TaskRepository):
     task_data = {"name": "Name", "user_id": 1, "description": "Description", "status": "new"}
     task = TaskCreate(**task_data)
@@ -114,7 +119,7 @@ async def test_get_tasks_invalid_id(task_repository: TaskRepository):
     assert tasks == []
 
 @pytest.mark.asyncio
-async def test_get_task_by_id(task_repository: TaskRepository, create_tasks):
+async def test_get_task_by_id(task_repository: TaskRepository):
     task = await task_repository.get_task_by_id(1, 1)
     assert task.name == "Name"
     assert task.user_id == 1
@@ -186,4 +191,109 @@ async def test_delete_task_nonexistent_user(task_repository: TaskRepository):
 @pytest.mark.asyncio
 async def test_delete_task_invalid_id(task_repository: TaskRepository):
     result = await task_repository.delete_task("invalid_id", 1)
+    assert result is None
+
+@pytest.mark.asyncio
+async def test_get_all_tasks(task_repository: TaskRepository):
+    tasks = await task_repository.get_all_tasks()
+    assert len(tasks) == 3
+
+    task = tasks[0]
+    assert task.name == "Updated Name"
+    assert task.user_id == 1
+    assert task.description == "Updated Description"
+    assert task.status == "in_progress"
+
+    task = tasks[1]
+    assert task.name == "Task 2"
+    assert task.user_id == 2
+    assert task.description == "Description 2"
+
+    task = tasks[2]
+    print(task.id)
+    assert task.name == "Task 3"
+    assert task.user_id == 3
+    assert task.description == "Description 3"
+
+@pytest.mark.asyncio
+async def test_get_specific_task_by_id(task_repository: TaskRepository):
+    task = await task_repository.get_specific_task_by_id(1)
+    assert task.name == "Updated Name"
+    assert task.user_id == 1
+    assert task.description == "Updated Description"
+    assert task.status == "in_progress"
+
+    # Task with id = 2 was deleted in tests before
+    task = await task_repository.get_specific_task_by_id(3)
+    print(task)
+    assert task.name == "Task 2"
+    assert task.user_id == 2
+    assert task.description == "Description 2"
+    assert task.status == "new"
+
+@pytest.mark.asyncio
+async def test_get_specific_task_by_id_nonexistent_task(task_repository: TaskRepository):
+    task = await task_repository.get_specific_task_by_id(999)
+    assert task is None
+
+@pytest.mark.asyncio
+async def test_get_specific_task_by_id_invalid_id(task_repository: TaskRepository):
+    task = await task_repository.get_specific_task_by_id("invalid_id")
+    assert task is None
+
+""" @pytest.mark.asyncio
+async def test_get_tasks_by_user_id(task_repository: TaskRepository):
+    tasks = await task_repository.get_tasks_by_user_id(1)
+    assert len(tasks) == 2
+
+    task = tasks[0]
+    assert task.name == "Updated Name"
+    assert task.user_id == 1
+    assert task.description == "Updated Description"
+    assert task.status == "in_progress"
+
+    task = tasks[1]
+    assert task.name == "Task 1"
+    assert task.user_id == 1
+    assert task.description == "Description 1"
+    assert task.status == "new" """
+
+@pytest.mark.asyncio
+async def test_update_specific_task(task_repository: TaskRepository):
+    task_data = {"name": "Updated Name", "user_id": 1, "description": "Updated Description", "status": "in_progress"}
+    task = TaskUpdate(**task_data)
+    result = await task_repository.update_specific_task(1, task)
+    assert isinstance(result, Task)
+    assert result.name == task_data["name"]
+    assert result.user_id == task_data["user_id"]
+    assert result.description == task_data["description"]
+    assert result.status == task_data["status"]
+
+@pytest.mark.asyncio
+async def test_update_specific_task_nonexistent_task(task_repository: TaskRepository):
+    task_data = {"name": "Updated Name", "user_id": 1, "description": "Updated Description", "status": "in_progress"}
+    task = TaskUpdate(**task_data)
+    result = await task_repository.update_specific_task(999, task)
+    assert result is None
+
+@pytest.mark.asyncio
+async def test_update_specific_task_invalid_id(task_repository: TaskRepository):
+    task_data = {"name": "Updated Name", "user_id": 1, "description": "Updated Description", "status": "in_progress"}
+    task = TaskUpdate(**task_data)
+    result = await task_repository.update_specific_task("invalid_id", task)
+    assert result is None
+
+@pytest.mark.asyncio
+async def test_delete_specific_task(task_repository: TaskRepository):
+    result = await task_repository.delete_specific_task(1)
+    assert result.__class__ is Task
+
+@pytest.mark.asyncio
+async def test_delete_specific_task_nonexistent_task(task_repository: TaskRepository):
+    result = await task_repository.delete_specific_task(999)
+    assert result is None
+
+@pytest.mark.asyncio
+async def test_delete_specific_task_invalid_id(task_repository: TaskRepository):
+    result = await task_repository.delete_specific_task("invalid_id")
     assert result is None
