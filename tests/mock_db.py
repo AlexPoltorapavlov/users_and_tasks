@@ -4,6 +4,7 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.pool import StaticPool
 from app.models.models import Base
+from app.schemas import *
 from app.repositories import UserRepository, TaskRepository
 from app.models.models import User, Task
 from pytest_asyncio import fixture as async_fixture
@@ -76,7 +77,7 @@ async def create_users(user_repository: UserRepository):
     return users_dict
 
 @async_fixture
-async def create_tasks(task_repository: TaskRepository, create_users):
+async def create_tasks(task_repository: TaskRepository):
     """
     Создать несколько задач в таблице задач
     """
@@ -87,6 +88,7 @@ async def create_tasks(task_repository: TaskRepository, create_users):
     ]
 
     for task in tasks_dict:
-        await task_repository.create(task)
+        task = TaskCreate(**task)
+        await task_repository.create_task(task)
 
     return tasks_dict
