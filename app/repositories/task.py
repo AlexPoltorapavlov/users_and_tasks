@@ -3,7 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from ..models.models import Task, User
 from ..schemas.tasks import *
-from app.errors import UserNotFoundError
+from app.errors import *
 
 def check_user_exists(func):
     async def wrapper(self, *args, **kwargs):
@@ -15,6 +15,20 @@ def check_user_exists(func):
         user_id = kwargs.get("user_id") or args[0].user_id
         if not await self._check_user_exists(user_id):
             raise UserNotFoundError(f"User with id {user_id} does not exist.")
+        else:
+            return await func(self, *args, **kwargs)
+    return wrapper
+
+def check_task_exists(func):
+    async def wrapper(self, *args, **kwargs):
+        """
+        kwargs.get("task_id") - task_id
+        or
+        args[0].task_id - task_id (args = tuple with TaskCreate)
+        """
+        task_id = kwargs.get("task_id") or args[0].task_id
+        if not await self._check_task_exists(task_id):
+            raise TaskNotFoundError(f"Task with id {task_id} does not exist.")
         else:
             return await func(self, *args, **kwargs)
     return wrapper
@@ -48,6 +62,21 @@ class TaskRepository:
         """
         try:
             result = await self.session.execute(select(self.user_table).where(self.user_table.id == user_id))
+            return result.scalar_one_or_none() is not None
+        except:
+            return False
+
+    async def _check_task_exists(self, task_id: int):
+        """Checks if a task with the given ID exists in the database.
+
+        Args:
+            task_id (int): The ID of the task to check.
+
+        Returns:
+            bool: True if the task exists, False otherwise.
+        """
+        try:
+            result = await self.session.execute(select(self.task_table).where(self.task_table.id == task_id))
             return result.scalar_one_or_none() is not None
         except:
             return False
