@@ -8,6 +8,7 @@ from app.schemas import *
 from app.repositories import UserRepository, TaskRepository
 from app.models.models import User, Task
 from pytest_asyncio import fixture as async_fixture
+from app.errors import *
 
 # адрес к тестовой базе данных
 TEST_DATABASE_URL = "sqlite+aiosqlite:///test_db.db"
