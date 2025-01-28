@@ -1,5 +1,5 @@
 class TaskNotFoundError(Exception):
     pass
 
-class TaskAlreadyExists(Exception):
+class TaskAlreadyExistsError(Exception):
     pass
