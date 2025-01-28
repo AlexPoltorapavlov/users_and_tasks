@@ -3,6 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from ..models.models import Task, User
 from ..schemas.tasks import *
+from app.errors import UserNotFoundError
 
 def check_user_exists(func):
     async def wrapper(self, *args, **kwargs):
@@ -13,7 +14,7 @@ def check_user_exists(func):
         """
         user_id = kwargs.get("user_id") or args[0].user_id
         if not await self._check_user_exists(user_id):
-            raise ValueError(f"User with id {user_id} does not exist.")
+            raise UserNotFoundError(f"User with id {user_id} does not exist.")
         else:
             return await func(self, *args, **kwargs)
     return wrapper
