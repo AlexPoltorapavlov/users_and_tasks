@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from ..models.models import Task, User
@@ -13,8 +13,7 @@ def check_user_exists(func):
         """
         user_id = kwargs.get("user_id") or args[0].user_id
         if not await self._check_user_exists(user_id):
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                                detail="User does not exist")
+            raise ValueError(f"User with id {user_id} does not exist.")
         else:
             return await func(self, *args, **kwargs)
     return wrapper
