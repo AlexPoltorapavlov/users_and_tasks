@@ -84,6 +84,7 @@ async def task_repository(get_base_task,
     task_repository.update_task = AsyncMock(return_value=updated_task)
     task_repository.delete_task = AsyncMock(return_value=base_task)
     task_repository.get_all_tasks = AsyncMock(return_value=all_tasks_from_db)
+    task_repository.get_specific_task_by_id = AsyncMock(return_value=base_task)
     return task_repository
 
 @async_fixture
