@@ -3,6 +3,7 @@ import pytest
 from app.managers.task import TaskManager, get_task_manager
 from .mock_repositories import *
 from app.schemas.tasks import *
+from pydantic import ValidationError
 
 
 @pytest.mark.asyncio
@@ -41,4 +42,13 @@ async def test_create_task_invalid_data(mock_get_task_manager):
             status="invalid_status", # status must be "new", "in_progress", "completed"
             user_id=1
         )
+
+@pytest.mark.asyncio
+async def test_get_tasks(mock_get_task_manager):
+    task_manager = mock_get_task_manager
+    user_id = 1
+    result = await task_manager.get_tasks(user_id) # must return list with 3 tasks
+    assert isinstance(result, list)
+    assert len(result) == 3
+    assert isinstance(result[0], TaskRead)
 
