@@ -30,3 +30,15 @@ async def test_create_task(mock_get_task_manager):
     assert isinstance(result, TaskRead)
     assert result.id == 1
     assert result.name == "Test Task"
+
+@pytest.mark.asyncio
+async def test_create_task_invalid_data(mock_get_task_manager):
+    task_manager = mock_get_task_manager 
+    with pytest.raises(ValidationError):
+        task_data = TaskCreate(
+            name="Test Task",
+            description="Test Description",
+            status="invalid_status", # status must be "new", "in_progress", "completed"
+            user_id=1
+        )
+
