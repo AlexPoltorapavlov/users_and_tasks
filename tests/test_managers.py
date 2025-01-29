@@ -52,3 +52,13 @@ async def test_get_tasks(mock_get_task_manager):
     assert len(result) == 3
     assert isinstance(result[0], TaskRead)
 
+@pytest.mark.asyncio
+async def test_get_task_by_id(mock_get_task_manager):
+    task_manager = mock_get_task_manager
+    task_id, user_id = 1, 1
+    result = await task_manager.get_task_by_id(task_id, user_id)
+    assert isinstance(result, TaskRead)
+    assert result.id == task_id
+
+
+
