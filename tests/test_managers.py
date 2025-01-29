@@ -111,3 +111,11 @@ async def test_update_specific_task(mock_get_task_manager):
     assert isinstance(result, TaskRead)
     assert result.id == task_id
     assert result.name == "Updated Test Task"
+
+@pytest.mark.asyncio
+async def test_delete_specific_task(mock_get_task_manager):
+    task_manager = mock_get_task_manager
+    task_id = 1
+    result = await task_manager.delete_specific_task(task_id)
+    assert isinstance(result, TaskRead)
+    assert result.id == task_id
