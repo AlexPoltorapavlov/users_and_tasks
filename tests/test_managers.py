@@ -60,5 +60,32 @@ async def test_get_task_by_id(mock_get_task_manager):
     assert isinstance(result, TaskRead)
     assert result.id == task_id
 
+@pytest.mark.asyncio
+async def test_update_task(mock_get_task_manager):
+    task_manager = mock_get_task_manager
+    task_id, user_id = 1, 1
+    task_data = TaskUpdate(
+        name="Updated Test Task",
+        description="Updated Test Description",
+        status="in_progress"
+    )
+    result = await task_manager.update_task(task_id, task_data, user_id)
+    assert isinstance(result, TaskRead)
+    assert result.id == task_id
+    assert result.name == "Updated Test Task"
 
+@pytest.mark.asyncio
+async def test_delete_task(mock_get_task_manager):
+    task_manager = mock_get_task_manager
+    task_id, user_id = 1, 1
+    result = await task_manager.delete_task(task_id, user_id)
+    assert isinstance(result, TaskRead)
+    assert result.id == task_id
 
+@pytest.mark.asyncio
+async def test_get_all_tasks(mock_get_task_manager):
+    task_manager = mock_get_task_manager
+    result = await task_manager.get_all_tasks()
+    assert isinstance(result, list)
+    assert len(result) == 3
+    assert isinstance(result[0], TaskRead)

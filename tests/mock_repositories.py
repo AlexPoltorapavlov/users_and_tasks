@@ -21,7 +21,7 @@ def get_base_task():
     return mock_task
 
 @pytest.fixture
-def get_update_task():
+def get_updated_task():
     mock_task = Task(
         id=1,
         name="Updated Test Task",
@@ -63,7 +63,9 @@ def get_all_tasks():
 ##########
 
 @async_fixture
-async def task_repository(get_base_task, get_all_tasks):
+async def task_repository(get_base_task,
+                          get_all_tasks,
+                          get_updated_task):
     """
     Args: 
         get_base_task(pytest.fixture) with base task example
@@ -74,9 +76,14 @@ async def task_repository(get_base_task, get_all_tasks):
     task_repository = AsyncMock(spec=TaskRepository)
     base_task = get_base_task
     all_tasks_of_user = get_all_tasks
+    all_tasks_from_db = get_all_tasks
+    updated_task = get_updated_task
     task_repository.create_task = AsyncMock(return_value=base_task)
     task_repository.get_tasks = AsyncMock(return_value=all_tasks_of_user)
     task_repository.get_task_by_id = AsyncMock(return_value=base_task)
+    task_repository.update_task = AsyncMock(return_value=updated_task)
+    task_repository.delete_task = AsyncMock(return_value=base_task)
+    task_repository.get_all_tasks = AsyncMock(return_value=all_tasks_from_db)
     return task_repository
 
 @async_fixture
@@ -86,3 +93,5 @@ async def mock_get_task_repository(task_repository):
 @async_fixture
 async def mock_get_task_manager(mock_get_task_repository):
     return TaskManager(mock_get_task_repository)
+
+
