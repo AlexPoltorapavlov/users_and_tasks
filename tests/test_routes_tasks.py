@@ -130,3 +130,13 @@ async def test_get_all_tasks(get_client, token):
 
     assert response.status_code == 200
     assert isinstance(response.json(), list)
+
+@pytest.mark.asyncio
+async def test_get_all_tasks_unauthorized(get_client):
+    client = get_client
+
+    response = client.get(
+        "/tasks"
+    )
+
+    assert response.status_code == 401
