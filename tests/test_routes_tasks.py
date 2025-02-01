@@ -118,3 +118,15 @@ async def test_create_task_missing_description_or_name(get_client, token):
     )
 
     assert response.status_code == 422
+
+@pytest.mark.asyncio
+async def test_get_all_tasks(get_client, token):
+    client = get_client
+
+    response = client.get(
+        "/tasks",
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)
