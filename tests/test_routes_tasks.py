@@ -346,3 +346,23 @@ async def test_delete_task_invalid_id(get_client, token):
     )
 
     assert response.status_code == 422
+
+@pytest.mark.asyncio
+async def test_delete_task(get_client, token):
+    client = get_client
+
+    response = client.delete(
+        "/tasks/1",
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    assert response.status_code == 200
+    assert response.json()["id"] == 1
+
+    response = client.get(
+        "/tasks/1",
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    assert response.status_code == 200
+    assert response.json() is None
