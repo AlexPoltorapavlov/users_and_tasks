@@ -206,3 +206,20 @@ async def test_update_task(get_client, token):
     assert response.json()["name"] == "Updated Task"
     assert response.json()["description"] == "Updated Description"
     assert response.json()["status"] == "in_progress"
+
+@pytest.mark.asyncio
+async def test_update_task_unauthorized(get_client):
+    client = get_client
+
+    task_data = {
+        "name": "Updated Task",
+        "description": "Updated Description",
+        "status": "in_progress"
+    }
+
+    response = client.put(
+        "/tasks/1",
+        json=task_data
+    )
+
+    assert response.status_code == 401
