@@ -259,3 +259,23 @@ async def test_update_task_invalid_status(get_client, token):
     )
 
     assert response.status_code == 422
+
+@pytest.mark.asyncio
+async def test_update_task_missing_status(get_client, token):
+    client = get_client
+
+    # status = "in_progress" after test_update_task
+    task_data = {
+        "name": "Updated Task",
+        "description": "Updated Description",
+        # status: Optional[enum]
+    }
+
+    response = client.put(
+        "/tasks/1",
+        json=task_data,
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    assert response.status_code == 200
+    assert response.json()["status"] == "in_progress"
