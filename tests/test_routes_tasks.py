@@ -279,3 +279,37 @@ async def test_update_task_missing_status(get_client, token):
 
     assert response.status_code == 200
     assert response.json()["status"] == "in_progress"
+
+@pytest.mark.asyncio
+async def test_update_task_missing_description_or_name(get_client, token):
+    client = get_client
+
+    task_data = {
+        "name": "Updated Task",
+        # description: str
+        "status": "in_progress"
+    }
+
+    response = client.put(
+        "/tasks/1",
+        json=task_data,
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    assert response.status_code == 200
+    assert response.json()["name"] == "Updated Task"
+
+    task_data = {
+        # name: str
+        "description": "Updated Description",
+        "status": "in_progress"
+    }
+
+    response = client.put(
+        "/tasks/1",
+        json=task_data,
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    assert response.status_code == 200
+    assert response.json()["description"] == "Updated Description"
