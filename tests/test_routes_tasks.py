@@ -162,3 +162,15 @@ async def test_get_task_unauthorized(get_client):
     )
 
     assert response.status_code == 401
+
+@pytest.mark.asyncio
+async def test_get_task_wrond_id(get_client, token):
+    client = get_client
+
+    response = client.get(
+        "/tasks/-1",
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    assert response.status_code == 200
+    assert response.json() == None
