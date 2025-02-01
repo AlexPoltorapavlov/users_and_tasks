@@ -335,3 +335,14 @@ async def test_delete_task_unauthorized(get_client):
     )
 
     assert response.status_code == 401
+
+@pytest.mark.asyncio
+async def test_delete_task_invalid_id(get_client, token):
+    client = get_client
+
+    response = client.delete(
+        "/tasks/invalid_id",
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    assert response.status_code == 422
