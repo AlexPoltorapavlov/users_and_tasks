@@ -7,7 +7,7 @@ __pycache__/
 *.so
 
 # Distribution / packaging
-database.db
+*.db
 .env
 .Python
 build/
