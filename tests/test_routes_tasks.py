@@ -173,7 +173,7 @@ async def test_get_task_wrond_id(get_client, token):
     )
 
     assert response.status_code == 200
-    assert response.json() == None
+    assert response.json() is None
 
 @pytest.mark.asyncio
 async def test_get_task_invalid_id(get_client, token):
@@ -313,3 +313,25 @@ async def test_update_task_missing_description_or_name(get_client, token):
 
     assert response.status_code == 200
     assert response.json()["description"] == "Updated Description"
+
+@pytest.mark.asyncio
+async def test_delete_task_incorrect_id(get_client, token):
+    client = get_client
+
+    response = client.delete(
+        "/tasks/-1",
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    assert response.status_code == 200
+    assert response.json() is None
+
+""" @pytest.mark.asyncio
+async def test_delete_task_unauthorized(get_client):
+    client = get_client
+
+    response = client.delete(
+        "/tasks/1"
+    )
+
+    assert response.status_code == 401 """
