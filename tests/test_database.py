@@ -43,7 +43,7 @@ def get_client():
         return client
 
 @pytest.fixture(scope="function")
-def get_test_user(get_client):
+def make_test_user(get_client):
     user_data = {
         "email": "test@example.com",
         "password": "password",
@@ -52,6 +52,15 @@ def get_test_user(get_client):
     client = get_client
     response = client.post("/auth/register", json=user_data)
     assert response.status_code == 201
+    return user_data
+
+@pytest.fixture(scope="function")
+def get_test_user():
+    user_data = {
+        "email": "test@example.com",
+        "password": "password",
+        "name": "Test User"
+    }
     return user_data
 
 @pytest.fixture(scope="function")
