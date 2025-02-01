@@ -223,3 +223,21 @@ async def test_update_task_unauthorized(get_client):
     )
 
     assert response.status_code == 401
+
+@pytest.mark.asyncio
+async def test_update_task_invalid_id(get_client, token):
+    client = get_client
+
+    task_data = {
+        "name": "Updated Task",
+        "description": "Updated Description",
+        "status": "in_progress"
+    }
+
+    response = client.put(
+        "/tasks/invalid_id",
+        json=task_data,
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    assert response.status_code == 422
