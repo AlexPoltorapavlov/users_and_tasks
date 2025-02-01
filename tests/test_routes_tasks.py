@@ -50,20 +50,63 @@ async def test_create_task(get_client, token):
     assert response.json()["name"] == "Test Task"
     assert response.json()["description"] == "Test Description"
 
-
-@fixture(scope="function")
-def get_access_token(get_client):
-    client = get_client
-    user_data = {"email": "user@example.com", "password": "string", "name": "string"}
-    response = client.post("/auth/jwt/login", data={"username": user_data["email"], "password": user_data["password"]})
-    assert response.status_code == 200
-    return response.json()["access_token"] """
-
 @pytest.mark.asyncio
-async def test_create_task(get_client, token):
+async def test_create_task_invalid_data(get_client, token):
     client = get_client
+
     task_data = {
         "name": "Test Task",
+        "description": "Test Description",
+        "status": "invalid_status"
+    }
+
+    response = client.post(
+        "/tasks",
+        json=task_data,
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    assert response.status_code == 422
+
+@pytest.mark.asyncio
+async def test_create_task_missing_status(get_client, token):
+    client = get_client
+
+    task_data = {
+        "name": "Test Task",
+        "description": "Test Description",
+        # status: Optional[enum] = "new"
+    }
+
+    response = client.post(
+        "/tasks",
+        json=task_data,
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    assert response.status_code == 200
+    assert response.json()["status"] == "new"
+
+@pytest.mark.asyncio
+async def test_create_task_missing_description_or_name(get_client, token):
+    client = get_client
+
+    task_data = {
+        "name": "Test Task",
+        # description: str 
+        "status": "new"
+    }
+
+    response = client.post(
+        "/tasks",
+        json=task_data,
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    assert response.status_code == 422
+
+    task_data = {
+        # name: str
         "description": "Test Description",
         "status": "new"
     }
@@ -74,6 +117,4 @@ async def test_create_task(get_client, token):
         headers={"Authorization": f"Bearer {token}"}
     )
 
-    assert response.status_code == 200
-    assert response.json()["name"] == "Test Task"
-    assert response.json()["description"] == "Test Description"
+    assert response.status_code == 422
