@@ -326,7 +326,7 @@ async def test_delete_task_incorrect_id(get_client, token):
     assert response.status_code == 200
     assert response.json() is None
 
-""" @pytest.mark.asyncio
+@pytest.mark.asyncio
 async def test_delete_task_unauthorized(get_client):
     client = get_client
 
@@ -334,4 +334,4 @@ async def test_delete_task_unauthorized(get_client):
         "/tasks/1"
     )
 
-    assert response.status_code == 401 """
+    assert response.status_code == 401
