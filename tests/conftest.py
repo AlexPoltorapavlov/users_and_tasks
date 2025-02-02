@@ -7,6 +7,7 @@ from app.models import Base
 import pytest
 from pytest_asyncio import fixture as async_fixture
 from fastapi.testclient import TestClient
+import os
 
 # Переопределение зависимости к сессиям для app
 TEST_DATABASE_URL = "sqlite+aiosqlite:///./test_db.db"
@@ -31,15 +32,16 @@ async def setup_db():
     """
     Создает таблицы в начале теста и удаляет в конце
     """
-    # Создаём таблицы перед тестами
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-    
+
     yield
-    
-    # Удаляем таблицы после тестов
+
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
+
+    if os.path.exists("test_db.db"):
+        os.remove("test_db.db")
 
 @pytest.fixture(scope="function")
 def get_client():

@@ -4,11 +4,7 @@ from app.errors import *
 from unittest.mock import patch, AsyncMock, MagicMock
 from app.repositories import UserRepository, TaskRepository
 from tests.mock_db import (
-        session,
-        user_repository,
         create_users,
-        setup_db,
-        task_repository,
         create_tasks
     )
 from app.schemas.tasks import TaskCreate, TaskRead, TaskUpdate

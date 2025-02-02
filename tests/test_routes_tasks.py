@@ -3,7 +3,7 @@ from pytest_asyncio import fixture as async_fixture
 from fastapi.testclient import TestClient
 from app.main import app
 from pytest import fixture
-from tests.test_database import (
+from tests.conftest import (
     get_client,
     token,
     make_test_user,
