@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from app.main import app
 from app.db import get_async_session
-from app.models import Base  # Импортируйте ваши модели
+from app.models import Base 
 import pytest
 from pytest_asyncio import fixture as async_fixture
 from fastapi.testclient import TestClient
@@ -21,9 +21,8 @@ async def override_get_async_session():
     async with TestingSessionLocal() as session:
         yield session
 
-app.dependency_overrides[get_async_session] = override_get_async_session
 
-@async_fixture(scope="session", autouse=True)
+@async_fixture(scope="module", autouse=True)
 async def setup_db():
     # Создаём таблицы перед тестами
     async with engine.begin() as conn:
@@ -37,6 +36,7 @@ async def setup_db():
 
 @pytest.fixture(scope="function")
 def get_client():
+    app.dependency_overrides[get_async_session] = override_get_async_session
     # Создаём клиент после переопределения зависимостей
     with TestClient(app) as client:
         print(type(client))
