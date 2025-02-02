@@ -9,6 +9,7 @@ from app.repositories import UserRepository, TaskRepository
 from app.models.models import User, Task
 from pytest_asyncio import fixture as async_fixture
 from app.errors import *
+from tests.conftest import override_get_async_session
 
 # # адрес к тестовой базе данных
 # TEST_DATABASE_URL = "sqlite+aiosqlite:///test_db.db"
@@ -43,22 +44,27 @@ from app.errors import *
 # async def session() -> AsyncGenerator:
 #     async with async_session_maker() as session:
 #         yield session
-# 
-# 
-# @async_fixture
-# async def user_repository(session: AsyncSession) -> UserRepository:
-#     """
-#     Репозиторий для взаимодействия СУБД с схемой пользователей
-#     """
-#     return UserRepository(session, User)
-# 
-# @async_fixture
-# async def task_repository(session: AsyncSession) -> TaskRepository:
-#     """
-#     Репозиторий для взаимодействия СУБД с схемой задач
-#     """
-#     return TaskRepository(session, Task, User)
-# 
+@async_fixture
+async def async_session() -> AsyncGenerator:
+    async_gen = override_get_async_session()
+    session = await async_gen.asend(None)
+    yield session
+    await session.close()
+
+@async_fixture
+async def user_repository(async_session) -> UserRepository:
+    """
+    Репозиторий для взаимодействия СУБД с схемой пользователей
+    """
+    return UserRepository(async_session, User)
+
+@async_fixture
+def task_repository(async_session) -> TaskRepository:
+    """
+    Репозиторий для взаимодействия СУБД с схемой задач
+    """
+    return TaskRepository(async_session, Task, User)
+
 
 # usefull fixtures
 @async_fixture

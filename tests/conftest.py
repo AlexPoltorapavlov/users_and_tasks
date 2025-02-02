@@ -1,5 +1,5 @@
 # code from test_database.py
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import sessionmaker
 from app.main import app
 from app.db import get_async_session
@@ -12,9 +12,8 @@ import os
 # Переопределение зависимости к сессиям для app
 TEST_DATABASE_URL = "sqlite+aiosqlite:///./test_db.db"
 engine = create_async_engine(TEST_DATABASE_URL, echo=True)
-TestingSessionLocal = sessionmaker(
+TestingSessionLocal = async_sessionmaker(
     bind=engine, 
-    class_=AsyncSession,
     expire_on_commit=False,
     autoflush=False
 )

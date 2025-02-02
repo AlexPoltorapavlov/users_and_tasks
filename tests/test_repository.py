@@ -3,9 +3,14 @@ import pytest_asyncio
 from app.errors import *
 from unittest.mock import patch, AsyncMock, MagicMock
 from app.repositories import UserRepository, TaskRepository
+from tests.conftest import setup_db, override_get_async_session
+from app.db import get_user_db, get_task_db
 from tests.mock_db import (
         create_users,
-        create_tasks
+        create_tasks,
+        user_repository,
+        task_repository,
+        async_session
     )
 from app.schemas.tasks import TaskCreate, TaskRead, TaskUpdate
 
@@ -16,9 +21,10 @@ from app.models import Task
 # ***************
 
 @pytest.mark.asyncio
-async def test_get_all_empty_database(setup_db, user_repository: UserRepository):
+async def test_get_all_empty_database(setup_db, user_repository):
     # Проверка, что метод get_all_users возвращает пустой список, если в базе нет пользователей
     all_users = await user_repository.get_all()
+    print(type(all_users))
     assert all_users == []
 
 @pytest.mark.asyncio
