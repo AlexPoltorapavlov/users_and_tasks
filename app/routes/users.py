@@ -10,13 +10,14 @@ from fastapi_users.exceptions import UserAlreadyExists
 router = APIRouter()
 
 def is_admin(user = Depends(current_active_user)):
-    """Check if the authenticated user is an admin.
+    """
+    Dependency function to check if the current user has admin privileges.
 
     Args:
-        user (UserRead): The authenticated user, automatically injected by the `current_active_user` dependency.
+        user: Current authenticated user, injected by FastAPI
 
     Returns:
-        bool: True if the user is a superuser (admin), otherwise False.
+        bool: True if user is a superuser, False otherwise
     """
     return True if user.is_superuser else False
 
@@ -24,20 +25,28 @@ def is_admin(user = Depends(current_active_user)):
 async def user_create(user_data: UserCreate,
                       admin = Depends(is_admin),
                       user_manager = Depends(get_user_manager)):
-    """Create a new user (admin-only endpoint).
+    """
+    Create a new user in the system.
+
+    This endpoint is restricted to admin users only. It allows creation of new users
+    with specified credentials and permissions.
 
     Args:
-        user_data (UserCreate): The user data to be created.
-        admin (bool): Whether the authenticated user is an admin, automatically injected by the `is_admin` dependency.
-        user_manager: The user manager instance, automatically injected by the `get_user_manager` dependency.
+        user_data (UserCreate): User data for creating new user
+        admin (bool): Whether the current user is an admin
+        user_manager: User manager instance for handling user operations
 
     Returns:
-        UserRead: The newly created user.
+        UserRead: Created user data
 
     Raises:
-        HTTPException:
-            - 403: If the authenticated user is not an admin.
-            - 409: If a user with the same email or username already exists.
+        HTTPException: 
+            - 403 if the user is not an admin
+            - 409 if a user with the same credentials already exists
+
+    Notes:
+        - Only admin users can create new users
+        - Email must be unique in the system
     """
     if admin:
         try:
@@ -50,10 +59,29 @@ async def user_create(user_data: UserCreate,
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="The appropriate level of execution permission has not been granted.")
 
-
 @router.get('/users')
 async def get_users(user_manager = Depends(get_user_manager),
                     admin = Depends(is_admin)):
+    """
+    Retrieve all users in the system.
+
+    This endpoint is restricted to admin users only. It returns a list of all
+    registered users in the system.
+
+    Args:
+        user_manager: User manager instance for handling user operations
+        admin (bool): Whether the current user is an admin
+
+    Returns:
+        list[UserRead]: List of all users in the system
+
+    Raises:
+        HTTPException: 403 if the user is not an admin
+
+    Notes:
+        - Only admin users can access this endpoint
+        - Returns all users regardless of their status
+    """
     if admin:
         result = await user_manager.get_all()
         return result
