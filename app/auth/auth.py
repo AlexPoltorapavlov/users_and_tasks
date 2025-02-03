@@ -113,6 +113,28 @@ class UserManager(BaseUserManager[User, int]):
 
 
 async def get_user_manager(user_db: UserRepository = Depends(get_user_db)):
+    """
+    FastAPI dependency that creates and yields a UserManager instance.
+    
+    This is a dependency factory that provides a UserManager instance for 
+    FastAPI dependency injection system. It validates that the provided user_db
+    is of the correct type before creating the UserManager.
+
+    Args:
+        user_db (UserRepository): Repository for user operations, injected by FastAPI.
+            Defaults to the result of get_user_db dependency.
+
+    Yields:
+        UserManager: An instance of UserManager configured with the provided UserRepository.
+
+    Raises:
+        TypeError: If user_db is not an instance of UserRepository.
+
+    Example:
+        @app.get("/users/")
+        async def get_users(user_manager: UserManager = Depends(get_user_manager)):
+            return await user_manager.get_all()
+    """
     if not isinstance(user_db, UserRepository):
         raise TypeError(f"Expected UserRepository, got {type(user_db).__name__}")
     yield UserManager(user_db)
