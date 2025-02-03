@@ -7,8 +7,6 @@ from .schemas.users import UserCreate, UserRead, UserUpdate
 # auth
 from .auth.auth import auth_backend, fastapi_users
 
-# sqlalchemy
-
 # routes
 from app.routes import authenticated_router
 from .routes.tasks import router as tasks_router
