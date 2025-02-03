@@ -6,11 +6,31 @@ from ..schemas.tasks import *
 from app.errors import *
 
 def check_user_exists(func):
+    """
+    Decorator that checks if a user exists before executing the decorated function.
+
+    Args:
+        func: The async function to be decorated
+
+    Returns:
+        wrapper: The wrapped function that performs the user existence check
+
+    Raises:
+        UserNotFoundError: If the user with the given ID does not exist
+    """
     async def wrapper(self, *args, **kwargs):
         """
-        kwargs.get("user_id") - user_id
-        or
-        args[0].user_id - user_id (args = tuple with TaskCreate)
+        Wrapper function that performs the user existence check.
+
+        Args:
+            *args: Variable length argument list
+            **kwargs: Arbitrary keyword arguments
+
+        Returns:
+            Any: Result of the decorated function
+
+        Raises:
+            UserNotFoundError: If the user with the given ID does not exist
         """
         user_id = kwargs.get("user_id") or args[0].user_id
         if not await self._check_user_exists(user_id):
@@ -20,11 +40,31 @@ def check_user_exists(func):
     return wrapper
 
 def check_task_exists(func):
+    """
+    Decorator that checks if a task exists before executing the decorated function.
+
+    Args:
+        func: The async function to be decorated
+
+    Returns:
+        wrapper: The wrapped function that performs the task existence check
+
+    Raises:
+        TaskNotFoundError: If the task with the given ID does not exist
+    """
     async def wrapper(self, *args, **kwargs):
         """
-        kwargs.get("task_id") - task_id
-        or
-        args[0].task_id - task_id (args = tuple with TaskCreate)
+        Wrapper function that performs the task existence check.
+
+        Args:
+            *args: Variable length argument list
+            **kwargs: Arbitrary keyword arguments
+
+        Returns:
+            Any: Result of the decorated function
+
+        Raises:
+            TaskNotFoundError: If the task with the given ID does not exist
         """
         task_id = kwargs.get("task_id") or args[0].task_id
         if not await self._check_task_exists(task_id):
@@ -34,18 +74,30 @@ def check_task_exists(func):
     return wrapper
 
 class TaskRepository:
-    """Repository class for handling database operations related to tasks."""
+    """
+    Repository class for handling database operations related to tasks.
+    
+    This class provides methods for creating, retrieving, updating, and deleting
+    tasks in the database, with support for both user-specific and general operations.
+
+    Attributes:
+        session (AsyncSession): The async SQLAlchemy session for database operations
+        task_table (Task): The SQLAlchemy model for tasks
+        user_table (User): The SQLAlchemy model for users
+    """
 
     def __init__(self,
                  session: AsyncSession,
                  task_table: Task,
                  user_table: User):
 
-        """Initializes the TaskRepository with an async database session.
+        """
+        Initialize the TaskRepository.
 
         Args:
-            session (AsyncSession): The async SQLAlchemy session for database operations.
-            task_table (Base(SQLAlchemy.orm.DeclarativeBase)): The task's model
+            session (AsyncSession): The async SQLAlchemy session for database operations
+            task_table (Task): The SQLAlchemy model for tasks
+            user_table (User): The SQLAlchemy model for users
         """
         self.session = session
         self.task_table = task_table
@@ -99,14 +151,14 @@ class TaskRepository:
         return task
 
     async def get_tasks(self, user_id: int):
-        """Retrieves all tasks associated with a specific user.
+        """
+        Retrieves all tasks associated with a specific user.
 
         Args:
-            user_id (int): The ID of the user whose tasks are to be retrieved.
-            is_admin (bool): The role of user
+            user_id (int): The ID of the user whose tasks are to be retrieved
 
         Returns:
-            list[Task]: A list of task objects associated with the user or all task objects if user is admin.
+            list[Task]: A list of task objects associated with the user
         """
         result = await self.session.execute(select(self.task_table).where(self.task_table.user_id == user_id))
         return result.scalars().all()
@@ -121,15 +173,15 @@ class TaskRepository:
         return result.scalars().all()
 
     async def get_task_by_id(self, task_id: int, user_id: int):
-        """Retrieves a specific task by its ID and user ID.
+        """
+        Retrieves a specific task by its ID and user ID.
 
         Args:
-            task_id (int): The ID of the task to retrieve.
-            user_id (int): The ID of the user associated with the task.
-            is_admin (bool): The role of user
+            task_id (int): The ID of the task to retrieve
+            user_id (int): The ID of the user associated with the task
 
         Returns:
-            Task | None: The task object if found, otherwise None.
+            Task | None: The task object if found, otherwise None
         """
         result = await self.session.execute(select(self.task_table).where(self.task_table.id == task_id, self.task_table.user_id == user_id))
         task = result.scalar_one_or_none()
@@ -149,15 +201,16 @@ class TaskRepository:
         return task if task else None
 
     async def update_task(self, task_id: int, task_data: TaskUpdate, user_id: int):
-        """Updates an existing task in the database.
+        """
+        Updates an existing task in the database.
 
         Args:
-            task_id (int): The ID of the task to update.
-            task_data (TaskUpdate): The updated task data.
-            user_id (int): The ID of the user associated with the task.
+            task_id (int): The ID of the task to update
+            task_data (TaskUpdate): The updated task data
+            user_id (int): The ID of the user associated with the task
 
         Returns:
-            Task | None: The updated task object if found, otherwise None.
+            Task | None: The updated task object if found and updated, otherwise None
         """
         task = await self.get_task_by_id(task_id, user_id)
         if task is None:
