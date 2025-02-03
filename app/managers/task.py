@@ -1,15 +1,19 @@
 from app.repositories import TaskRepository
 from app.db import get_task_db
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 from app.schemas.tasks import TaskCreate, TaskUpdate, TaskRead
+from app.errors.user_errors import UserNotFoundError
 
 class TaskManager:
     def __init__(self, task_db):
         self.task_db = task_db
 
     async def create_task(self, task_data: TaskCreate):
-        result = await self.task_db.create_task(task_data)
-        return TaskRead(**result.__dict__) if result else None
+        try:
+            result = await self.task_db.create_task(task_data)
+            return TaskRead(**result.__dict__) if result else None
+        except UserNotFoundError:
+            raise HTTPException(status_code=404, detail=f"User id: {task_data.user_id} not found")
 
     async def get_tasks(self, user_id: int):
         results = await self.task_db.get_tasks(user_id)
