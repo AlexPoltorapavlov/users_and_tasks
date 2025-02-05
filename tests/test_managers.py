@@ -30,15 +30,13 @@ async def test_create_task(mock_get_task_manager):
         name="Test Task",
         description="Test Description",
         status="new",
-        user_id=1  # Убедитесь, что user_id передается, если требуется
+        user_id=1 
     )
     
     result = await task_manager.create_task(task_data)
     
-    # Проверяем, что метод create_task репозитория был вызван
     task_manager.task_db.create_task.assert_awaited_once_with(task_data)
     
-    # Проверяем, что результат соответствует ожиданиям
     assert isinstance(result, TaskRead)
     assert result.id == 1
     assert result.name == "Test Task"

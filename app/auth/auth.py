@@ -1,5 +1,4 @@
 from fastapi_users.authentication import JWTStrategy, BearerTransport, AuthenticationBackend
-from sqlalchemy import select
 from ..config import config
 from fastapi import Depends, Request
 from fastapi_users import BaseUserManager, FastAPIUsers

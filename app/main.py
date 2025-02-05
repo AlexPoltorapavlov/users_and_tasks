@@ -2,15 +2,17 @@ import uvicorn
 from fastapi import FastAPI
 
 # schemas import
-from .schemas.users import UserCreate, UserRead, UserUpdate
+from app.schemas import UserCreate, UserRead, UserUpdate
 
 # auth
 from .auth.auth import auth_backend, fastapi_users
 
 # routes
-from app.routes import authenticated_router
-from .routes.tasks import router as tasks_router
-from .routes.users import router as users_router
+from app.routes import (
+    authenticated_router,
+    tasks_router,
+    users_router,
+)
 
 app = FastAPI()
 

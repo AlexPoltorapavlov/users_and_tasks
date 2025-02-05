@@ -1,6 +1,6 @@
 from fastapi_users.db import SQLAlchemyBaseUserTable
 from sqlalchemy.orm import relationship
-from sqlalchemy import Column, String, Integer, ForeignKey
+from sqlalchemy import Column, String, Integer
 from app.models.base_model import Base
 
 class User(SQLAlchemyBaseUserTable, Base):
