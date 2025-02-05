@@ -5,7 +5,7 @@ from fastapi import Depends, Request
 from fastapi_users import BaseUserManager, FastAPIUsers
 from app.repositories.user import UserRepository
 
-from app.models.models import User
+from app.models.user_model import User
 from app.db import get_user_db
 
 from typing import Optional, List

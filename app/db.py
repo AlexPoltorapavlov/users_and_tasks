@@ -5,7 +5,8 @@ from fastapi import Depends
 from app.repositories import UserRepository, TaskRepository
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from .models.models import Task, User, Base
+from app.models import Task, User
+from app.models.base_model import Base
 
 
 DATABASE_URL = config.DATABASE_URL

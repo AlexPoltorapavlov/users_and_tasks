@@ -3,10 +3,10 @@ import os
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.pool import StaticPool
-from app.models.models import Base
+from app.models.base_model import Base
 from app.schemas import *
 from app.repositories import UserRepository, TaskRepository
-from app.models.models import User, Task
+from app.models import User, Task
 from pytest_asyncio import fixture as async_fixture
 from app.errors import *
 from tests.conftest import override_get_async_session

@@ -2,7 +2,7 @@ from pytest_asyncio import fixture as async_fixture
 import pytest
 from app.repositories import TaskRepository
 from unittest.mock import AsyncMock
-from app.models import Task, User
+from app.models import Task
 from app.managers.task import TaskManager
 
 #########

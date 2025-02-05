@@ -1,5 +1,5 @@
 from fastapi_users.db import SQLAlchemyUserDatabase
-from app.models.models import User
+from app.models import User
 from sqlalchemy import select
 
 class UserRepository(SQLAlchemyUserDatabase):

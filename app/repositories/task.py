@@ -1,7 +1,7 @@
 from fastapi import Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from ..models.models import Task, User
+from app.models import Task, User
 from ..schemas.tasks import *
 from app.errors import *
 
