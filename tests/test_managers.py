@@ -1,8 +1,19 @@
-import pytest_asyncio
 import pytest
 from app.managers.task import TaskManager, get_task_manager
-from .mock_repositories import *
-from app.schemas.tasks import *
+from tests.mock_repositories import (
+    mock_get_task_repository,
+    task_repository,
+    get_base_task,
+    get_all_tasks,
+    mock_get_task_manager,
+    get_updated_task,
+
+)
+from app.schemas import (
+    TaskCreate,
+    TaskRead,
+    TaskUpdate,
+)
 from pydantic import ValidationError
 
 

@@ -2,8 +2,11 @@ from fastapi import Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models import Task, User
-from ..schemas.tasks import *
-from app.errors import *
+from app.schemas import (
+    TaskCreate,
+    TaskUpdate
+)
+from app.errors import UserNotFoundError, TaskNotFoundError
 
 def check_user_exists(func):
     """

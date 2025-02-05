@@ -1,6 +1,6 @@
 import pytest
 import pytest_asyncio
-from app.errors import *
+from app.errors import UserNotFoundError
 from unittest.mock import patch, AsyncMock, MagicMock
 from app.repositories import UserRepository, TaskRepository
 from tests.conftest import setup_db, override_get_async_session
