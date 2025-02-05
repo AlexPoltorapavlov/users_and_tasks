@@ -5,7 +5,7 @@ from fastapi_users import BaseUserManager, FastAPIUsers
 from app.repositories.user import UserRepository
 
 from app.models.user_model import User
-from app.db import get_user_db
+from app.repositories import get_user_repository
 
 from typing import Optional, List
 
@@ -111,7 +111,7 @@ class UserManager(BaseUserManager[User, int]):
         return int(value)
 
 
-async def get_user_manager(user_db: UserRepository = Depends(get_user_db)):
+async def get_user_manager(user_db: UserRepository = Depends(get_user_repository)):
     """
     FastAPI dependency that creates and yields a UserManager instance.
     
@@ -121,7 +121,7 @@ async def get_user_manager(user_db: UserRepository = Depends(get_user_db)):
 
     Args:
         user_db (UserRepository): Repository for user operations, injected by FastAPI.
-            Defaults to the result of get_user_db dependency.
+            Defaults to the result of get_user_repository dependency.
 
     Yields:
         UserManager: An instance of UserManager configured with the provided UserRepository.

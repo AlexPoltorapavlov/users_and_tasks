@@ -1,5 +1,5 @@
 from app.repositories import TaskRepository
-from app.db import get_task_db
+from app.repositories import get_task_repository
 from fastapi import Depends, HTTPException
 from app.schemas.tasks import TaskCreate, TaskUpdate, TaskRead
 from app.errors.user_errors import UserNotFoundError
@@ -150,13 +150,13 @@ class TaskManager:
         return TaskRead(**result.__dict__) if result else None
 
 
-async def get_task_manager(task_db: TaskRepository = Depends(get_task_db)):
+async def get_task_manager(task_db: TaskRepository = Depends(get_task_repository)):
     """
     FastAPI dependency that creates and yields a TaskManager instance.
 
     Args:
         task_db (TaskRepository): Repository for task operations, injected by FastAPI.
-            Defaults to the result of get_task_db dependency.
+            Defaults to the result of get_task_repository dependency.
 
     Yields:
         TaskManager: An instance of TaskManager configured with the provided TaskRepository.

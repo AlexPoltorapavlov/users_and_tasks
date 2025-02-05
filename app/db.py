@@ -40,24 +40,3 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     async with async_session_maker() as session:
         yield session
 
-async def get_user_db(session: AsyncSession = Depends(get_async_session)):
-    """Dependency function to provide a `SQLAlchemyUserDatabase` instance.
-
-    Args:
-        session (AsyncSession): The async SQLAlchemy session, injected by the `get_async_session` dependency.
-
-    Returns:
-        SQLAlchemyUserDatabase: An instance of `SQLAlchemyUserDatabase` for managing user-related database operations.
-    """
-    yield UserRepository(session, User)
-
-async def get_task_db(session: AsyncSession = Depends(get_async_session)):
-    """Dependency function to provide a TaskRepository instance with an async session.
-
-    Args:
-        session (AsyncSession): The async SQLAlchemy session (injected by FastAPI).
-
-    Yields:
-        TaskRepository: An instance of TaskRepository for handling task-related database operations.
-    """
-    yield TaskRepository(session, Task, User)

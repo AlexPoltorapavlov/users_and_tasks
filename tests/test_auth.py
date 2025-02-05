@@ -33,7 +33,7 @@ async def test_get_user_manager_edge_case_empty_user_db():
 async def test_get_user_manager_returns_user_manager():
     mock_user_db = AsyncMock(spec=UserRepository)
 
-    with patch('app.auth.auth.get_user_db', return_value=mock_user_db):
+    with patch('app.auth.auth.get_user_repository', return_value=mock_user_db):
         user_manager_generator = get_user_manager(mock_user_db)
         user_manager = await anext(user_manager_generator)
 
