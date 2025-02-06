@@ -1,4 +1,3 @@
-# code from test_database.py
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import sessionmaker
 from app.main import app
@@ -10,7 +9,6 @@ from pytest_asyncio import fixture as async_fixture
 from fastapi.testclient import TestClient
 import os
 
-# Переопределение зависимости к сессиям для app
 TEST_DATABASE_URL = "sqlite+aiosqlite:///./test_db.db"
 engine = create_async_engine(TEST_DATABASE_URL, echo=True)
 TestingSessionLocal = async_sessionmaker(
@@ -19,7 +17,6 @@ TestingSessionLocal = async_sessionmaker(
     autoflush=False
 )
 
-# Асинхронный генератор для тестовой сессии
 async def override_get_async_session():
     """
     Функция для замены настоящего get_async_session
@@ -45,9 +42,7 @@ async def setup_db():
 
 @pytest.fixture(scope="function")
 def get_client():
-    # Переопределяем get_async_session перед тем, как получить клиент
     app.dependency_overrides[get_async_session] = override_get_async_session
-    # Создаём клиент после переопределения зависимостей
     with TestClient(app) as client:
         print(type(client))
         return client

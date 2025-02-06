@@ -5,9 +5,6 @@ from unittest.mock import AsyncMock
 from app.models import Task
 from app.managers.task import TaskManager
 
-#########
-# Фикстуры с задачами
-#########
 
 @pytest.fixture
 def get_base_task():
@@ -57,10 +54,6 @@ def get_all_tasks():
         )
     ]
     return mock_tasks
-
-##########
-# Фикстуры для получения объекта TaskManager
-##########
 
 @async_fixture
 async def task_repository(get_base_task,

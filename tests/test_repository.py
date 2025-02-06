@@ -19,22 +19,17 @@ from app.models import Task
 
 @pytest.mark.asyncio
 async def test_get_all_empty_database(setup_db, user_repository):
-    # Проверка, что метод get_all_users возвращает пустой список, если в базе нет пользователей
     all_users = await user_repository.get_all()
     print(type(all_users))
     assert all_users == []
 
 @pytest.mark.asyncio
 async def test_get_all(user_repository: UserRepository, create_users):
-    # Фикстура setup_db автоматически создаст схему базы данных
-    # Фикстура create_users автоматически создаст пользователей
-    created_users = create_users  # Получаем список созданных пользователей
-    
-    # Вызываем метод get_all_users
+    created_users = create_users
+
     all_users = await user_repository.get_all()
     all_users_dicts = [user.__dict__ for user in all_users]
 
-    # Проверки
     assert len(all_users) == len(created_users)
 
     for i, user in enumerate(created_users):
@@ -239,23 +234,6 @@ async def test_get_specific_task_by_id_nonexistent_task(task_repository: TaskRep
 async def test_get_specific_task_by_id_invalid_id(task_repository: TaskRepository):
     task = await task_repository.get_specific_task_by_id("invalid_id")
     assert task is None
-
-""" @pytest.mark.asyncio
-async def test_get_tasks_by_user_id(task_repository: TaskRepository):
-    tasks = await task_repository.get_tasks_by_user_id(1)
-    assert len(tasks) == 2
-
-    task = tasks[0]
-    assert task.name == "Updated Name"
-    assert task.user_id == 1
-    assert task.description == "Updated Description"
-    assert task.status == "in_progress"
-
-    task = tasks[1]
-    assert task.name == "Task 1"
-    assert task.user_id == 1
-    assert task.description == "Description 1"
-    assert task.status == "new" """
 
 @pytest.mark.asyncio
 async def test_update_specific_task(task_repository: TaskRepository):
