@@ -87,5 +87,6 @@ docker build -t users_and_tasks
 ```
 To start container:
 ```bash
-docker run -d users_and_tasks
+docker run -p 80:80 users_and_tasks
 ```
+The site will be available at the url: http://0.0.0.0:80
