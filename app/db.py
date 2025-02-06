@@ -1,11 +1,8 @@
 from collections.abc import AsyncGenerator
 from .config import config
 
-from fastapi import Depends
-from app.repositories import UserRepository, TaskRepository
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from app.models import Task, User
 from app.models.base_model import Base
 
 
