@@ -72,3 +72,20 @@ For development with hot reload:
 ```bash
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
+
+## Testing
+
+For testing:
+```bash
+poetry run pytest
+```
+
+## Docker
+To make image:
+```bash
+docker build -t users_and_tasks
+```
+To start container:
+```bash
+docker run -d users_and_tasks
+```
